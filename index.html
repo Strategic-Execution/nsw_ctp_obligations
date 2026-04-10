@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -456,6 +457,154 @@ tbody tr.status-pending:hover { background: rgba(99,102,241,0.14); }
   margin-top: 40px;
 }
 
+/* ─── CLICKABLE ELEMENTS ─── */
+.stat-card.clickable { cursor: pointer; position: relative; }
+.stat-card.clickable::after {
+  content: '→';
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  font-size: 16px;
+  color: var(--grey-200);
+  transition: color 0.2s, transform 0.2s;
+}
+.stat-card.clickable:hover::after { color: var(--teal); transform: translateX(3px); }
+.stat-card.clickable:hover { box-shadow: var(--shadow-lg); border-left-width: 6px; }
+
+.bar-row.clickable { cursor: pointer; border-radius: 6px; padding: 2px 0; transition: background 0.15s; }
+.bar-row.clickable:hover { background: var(--off-white); }
+.bar-row.clickable .bar-fill { position: relative; }
+.bar-row.clickable:hover .bar-fill { filter: brightness(1.1); }
+
+tbody tr.clickable-row { cursor: pointer; }
+tbody tr.clickable-row:hover { background: rgba(43,155,184,0.06) !important; }
+
+/* ─── BREADCRUMB ─── */
+.breadcrumb {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: var(--grey-300);
+}
+.breadcrumb.visible { display: flex; }
+.breadcrumb a {
+  color: var(--teal);
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.breadcrumb a:hover { color: var(--navy); text-decoration: underline; }
+.breadcrumb .sep { color: var(--grey-200); }
+.breadcrumb .current { color: var(--navy); font-weight: 600; }
+
+/* ─── DETAIL PANEL ─── */
+.detail-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(15,26,58,0.4);
+  z-index: 100;
+  animation: fadeIn 0.2s ease;
+}
+.detail-overlay.open { display: block; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+.detail-panel {
+  position: fixed;
+  top: 0; right: 0;
+  width: min(560px, 90vw);
+  height: 100vh;
+  background: var(--white);
+  box-shadow: -8px 0 40px rgba(15,26,58,0.15);
+  z-index: 101;
+  display: none;
+  flex-direction: column;
+  animation: slideIn 0.25s ease;
+}
+.detail-panel.open { display: flex; }
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--grey-100);
+  background: var(--off-white);
+}
+.detail-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--navy);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.detail-close {
+  width: 36px; height: 36px;
+  border: none;
+  background: var(--white);
+  border-radius: 8px;
+  font-size: 20px;
+  color: var(--grey-300);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.detail-close:hover { background: var(--grey-100); color: var(--navy); }
+
+.detail-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+.detail-section { margin-bottom: 20px; }
+.detail-section h4 {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--grey-300);
+  margin-bottom: 6px;
+}
+.detail-section p, .detail-section div {
+  font-size: 14px;
+  color: var(--grey-700);
+  line-height: 1.6;
+}
+.detail-field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.detail-nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-top: 1px solid var(--grey-100);
+  background: var(--off-white);
+}
+.detail-nav button {
+  padding: 8px 16px;
+  border: 2px solid var(--grey-100);
+  background: var(--white);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--grey-700);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.detail-nav button:hover { border-color: var(--teal); color: var(--teal); }
+.detail-nav button:disabled { opacity: 0.3; cursor: not-allowed; }
+.detail-nav button:disabled:hover { border-color: var(--grey-100); color: var(--grey-700); }
+
 /* ─── PANEL VISIBILITY ─── */
 .panel { display: none; }
 .panel.active { display: block; }
@@ -493,19 +642,19 @@ tbody tr.status-pending:hover { background: rgba(99,102,241,0.14); }
 
   <!-- STATS ROW -->
   <div class="stats-row">
-    <div class="stat-card navy">
+    <div class="stat-card navy clickable" onclick="drillDown('all')">
       <div class="stat-num">140</div>
       <div class="stat-label">Total Obligations</div>
     </div>
-    <div class="stat-card green">
+    <div class="stat-card green clickable" onclick="drillDown('status','new')">
       <div class="stat-num" style="color:var(--new-green)">8</div>
       <div class="stat-label">New (Post Early-2025)</div>
     </div>
-    <div class="stat-card amber">
+    <div class="stat-card amber clickable" onclick="drillDown('status','amended')">
       <div class="stat-num" style="color:var(--amended-amber)">7</div>
       <div class="stat-label">Amended</div>
     </div>
-    <div class="stat-card purple">
+    <div class="stat-card purple clickable" onclick="drillDown('status','pending')">
       <div class="stat-num" style="color:var(--pending-blue)">2</div>
       <div class="stat-label">Pending Legislation</div>
     </div>
@@ -586,6 +735,11 @@ tbody tr.status-pending:hover { background: rgba(99,102,241,0.14); }
 
   <!-- ═══ OBLIGATIONS PANEL ═══ -->
   <div class="panel" id="panel-obligations">
+    <div class="breadcrumb" id="breadcrumb">
+      <a onclick="clearDrillDown()">Dashboard</a>
+      <span class="sep">›</span>
+      <span class="current" id="breadcrumb-label">All Obligations</span>
+    </div>
     <div class="legend">
       <div class="legend-item"><div class="legend-swatch swatch-original"></div> Original (validated)</div>
       <div class="legend-item"><div class="legend-swatch swatch-new"></div> New obligation</div>
@@ -766,6 +920,20 @@ tbody tr.status-pending:hover { background: rgba(99,102,241,0.14); }
     </div>
   </div>
 
+  <!-- DETAIL PANEL -->
+  <div class="detail-overlay" id="detail-overlay" onclick="closeDetail()"></div>
+  <div class="detail-panel" id="detail-panel">
+    <div class="detail-header">
+      <h2 id="detail-title"></h2>
+      <button class="detail-close" onclick="closeDetail()" title="Close">✕</button>
+    </div>
+    <div class="detail-body" id="detail-body"></div>
+    <div class="detail-nav">
+      <button onclick="navigateDetail(-1)" id="detail-prev">← Previous</button>
+      <button onclick="navigateDetail(1)" id="detail-next">Next →</button>
+    </div>
+  </div>
+
   <div class="footer">
     NSW CTP Obligations Compliance Dashboard &mdash; Insurance Australia Group &mdash; Generated 10 April 2026<br>
     <span style="font-size:11px">Sources: Motor Accidents Injuries Act 2017 (NSW), SIRA Motor Accident Guidelines v10.1, SIRA Regulatory Activity Reports, AustLII</span>
@@ -778,6 +946,10 @@ const DATA = {"obligations": [{"id": "P2\u201101", "ref": "s 2.1", "statement": 
 
 const obligations = DATA.obligations;
 
+// ─── STATE ───
+let currentDetailIndex = -1;
+let currentVisibleList = obligations;
+
 // ─── INIT ───
 function init() {
   buildOwnerFilter();
@@ -787,6 +959,7 @@ function init() {
   buildOwnerChart();
   buildPartChart();
   buildStatusChart();
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
 }
 
 function buildOwnerFilter() {
@@ -811,12 +984,14 @@ function getOwnerClass(owner) {
 function renderObligationsTable(data) {
   const tbody = document.getElementById('obligations-tbody');
   tbody.innerHTML = '';
-  data.forEach(o => {
+  currentVisibleList = data;
+  data.forEach((o, idx) => {
     const statusClass = o.status !== 'original' ? 'status-' + o.status : '';
     const badgeClass = 'badge-' + o.status;
     const statusLabel = o.status === 'original' ? 'Validated' : o.status.charAt(0).toUpperCase() + o.status.slice(1);
     const tr = document.createElement('tr');
-    tr.className = statusClass;
+    tr.className = statusClass + ' clickable-row';
+    tr.onclick = () => openDetail(o, idx, data);
     tr.innerHTML = `
       <td class="id-cell">${o.id}</td>
       <td class="ref-cell">${o.ref}</td>
@@ -824,8 +999,8 @@ function renderObligationsTable(data) {
       <td>${o.trigger}</td>
       <td>${o.risk}</td>
       <td>${o.controls}</td>
-      <td><span class="owner-badge ${getOwnerClass(o.owner)}">${o.owner}</span></td>
-      <td><span class="status-badge ${badgeClass}">${statusLabel}</span></td>
+      <td><span class="owner-badge ${getOwnerClass(o.owner)}" onclick="event.stopPropagation();drillDown('owner','${o.owner}')" style="cursor:pointer">${o.owner}</span></td>
+      <td><span class="status-badge ${badgeClass}" onclick="event.stopPropagation();drillDown('status','${o.status}')" style="cursor:pointer">${statusLabel}</span></td>
       <td style="white-space:nowrap;font-size:12px">${o.effective}</td>
     `;
     tbody.appendChild(tr);
@@ -837,18 +1012,19 @@ function renderChangesTable() {
   const changed = obligations.filter(o => o.status !== 'original');
   const tbody = document.getElementById('changes-tbody');
   tbody.innerHTML = '';
-  changed.forEach(o => {
+  changed.forEach((o, idx) => {
     const statusClass = 'status-' + o.status;
     const badgeClass = 'badge-' + o.status;
     const statusLabel = o.status.charAt(0).toUpperCase() + o.status.slice(1);
     const tr = document.createElement('tr');
-    tr.className = statusClass;
+    tr.className = statusClass + ' clickable-row';
+    tr.onclick = () => openDetail(o, idx, changed);
     tr.innerHTML = `
       <td class="id-cell">${o.id}</td>
       <td class="ref-cell">${o.ref}</td>
       <td>${o.statement}</td>
-      <td><span class="owner-badge ${getOwnerClass(o.owner)}">${o.owner}</span></td>
-      <td><span class="status-badge ${badgeClass}">${statusLabel}</span></td>
+      <td><span class="owner-badge ${getOwnerClass(o.owner)}" onclick="event.stopPropagation();drillDown('owner','${o.owner}')" style="cursor:pointer">${o.owner}</span></td>
+      <td><span class="status-badge ${badgeClass}" onclick="event.stopPropagation();drillDown('status','${o.status}')" style="cursor:pointer">${statusLabel}</span></td>
       <td style="white-space:nowrap;font-size:12px">${o.effective}</td>
     `;
     tbody.appendChild(tr);
@@ -875,6 +1051,152 @@ function switchTab(name) {
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   event.target.closest('.tab-btn').classList.add('active');
   document.getElementById('panel-' + name).classList.add('active');
+  if (name !== 'obligations') {
+    document.getElementById('breadcrumb').classList.remove('visible');
+  }
+}
+
+// ─── DRILL DOWN ───
+function drillDown(type, value) {
+  // Switch to obligations tab
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  tabBtns[1].classList.add('active'); // "All Obligations" tab
+  document.getElementById('panel-obligations').classList.add('active');
+
+  // Clear existing filters
+  document.getElementById('search-input').value = '';
+  document.getElementById('filter-owner').value = '';
+  document.getElementById('filter-part').value = '';
+  document.getElementById('filter-status').value = '';
+
+  const breadcrumb = document.getElementById('breadcrumb');
+  const breadcrumbLabel = document.getElementById('breadcrumb-label');
+
+  if (type === 'all') {
+    breadcrumb.classList.remove('visible');
+    renderObligationsTable(obligations);
+    return;
+  }
+
+  // Set filter and label
+  const labels = {
+    'owner': value,
+    'status': { original: 'Original (validated)', new: 'New Obligations', amended: 'Amended', pending: 'Pending Legislation' }[value] || value,
+    'part': { P2: 'Part 2 — Insurance', P3: 'Part 3 — Statutory Benefits', P4: 'Part 4 — Damages', P5: 'Part 5 — Disputes', P6: 'Part 6 — Regulation', P7: 'Part 7 — Miscellaneous', NEW: 'New Obligations', PEND: 'Pending' }[value] || value
+  };
+
+  if (type === 'owner') document.getElementById('filter-owner').value = value;
+  if (type === 'status') document.getElementById('filter-status').value = value;
+  if (type === 'part') document.getElementById('filter-part').value = value;
+
+  breadcrumbLabel.textContent = labels[type];
+  breadcrumb.classList.add('visible');
+
+  filterTable();
+
+  // Smooth scroll to table
+  document.getElementById('panel-obligations').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function clearDrillDown() {
+  document.getElementById('search-input').value = '';
+  document.getElementById('filter-owner').value = '';
+  document.getElementById('filter-part').value = '';
+  document.getElementById('filter-status').value = '';
+  document.getElementById('breadcrumb').classList.remove('visible');
+
+  // Go back to overview
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn')[0].classList.add('active');
+  document.getElementById('panel-overview').classList.add('active');
+  renderObligationsTable(obligations);
+}
+
+// ─── DETAIL PANEL ───
+function openDetail(obligation, index, list) {
+  currentDetailIndex = index;
+  currentVisibleList = list;
+  renderDetail(obligation);
+  document.getElementById('detail-overlay').classList.add('open');
+  document.getElementById('detail-panel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  updateDetailNav();
+}
+
+function closeDetail() {
+  document.getElementById('detail-overlay').classList.remove('open');
+  document.getElementById('detail-panel').classList.remove('open');
+  document.body.style.overflow = '';
+  currentDetailIndex = -1;
+}
+
+function navigateDetail(dir) {
+  const newIndex = currentDetailIndex + dir;
+  if (newIndex < 0 || newIndex >= currentVisibleList.length) return;
+  currentDetailIndex = newIndex;
+  renderDetail(currentVisibleList[newIndex]);
+  updateDetailNav();
+}
+
+function updateDetailNav() {
+  document.getElementById('detail-prev').disabled = currentDetailIndex <= 0;
+  document.getElementById('detail-next').disabled = currentDetailIndex >= currentVisibleList.length - 1;
+}
+
+function renderDetail(o) {
+  const statusLabel = o.status === 'original' ? 'Validated' : o.status.charAt(0).toUpperCase() + o.status.slice(1);
+  const badgeClass = 'badge-' + o.status;
+
+  document.getElementById('detail-title').innerHTML = `
+    <span class="id-cell" style="font-size:16px">${o.id}</span>
+    <span class="status-badge ${badgeClass}">${statusLabel}</span>
+  `;
+
+  document.getElementById('detail-body').innerHTML = `
+    <div class="detail-section">
+      <h4>Reference</h4>
+      <p style="font-family:'JetBrains Mono',monospace;color:var(--navy)">${o.ref}</p>
+    </div>
+    <div class="detail-section">
+      <h4>Obligation</h4>
+      <p>${o.statement}</p>
+    </div>
+    <div class="detail-field-grid">
+      <div class="detail-section">
+        <h4>Trigger</h4>
+        <p>${o.trigger}</p>
+      </div>
+      <div class="detail-section">
+        <h4>Effective Date</h4>
+        <p>${o.effective}</p>
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>Risk</h4>
+      <p style="color:var(--red-flag);font-weight:500">${o.risk}</p>
+    </div>
+    <div class="detail-section">
+      <h4>Controls</h4>
+      <p>${o.controls}</p>
+    </div>
+    <div class="detail-section">
+      <h4>Evidence</h4>
+      <p>${o.evidence || '—'}</p>
+    </div>
+    <div class="detail-field-grid">
+      <div class="detail-section">
+        <h4>Owner</h4>
+        <div><span class="owner-badge ${getOwnerClass(o.owner)}">${o.owner}</span></div>
+      </div>
+      <div class="detail-section">
+        <h4>Act Part</h4>
+        <p>${o.part}</p>
+      </div>
+    </div>
+  `;
 }
 
 // ─── CHARTS ───
@@ -887,7 +1209,7 @@ function buildOwnerChart() {
   const colors = ['navy-bar', 'teal-bar', 'orange-bar'];
   sorted.forEach(([owner, count], i) => {
     const pct = (count / max * 100).toFixed(0);
-    container.innerHTML += `<div class="bar-row"><div class="bar-label">${owner}</div><div class="bar-track"><div class="bar-fill ${colors[i % 3]}" style="width:${pct}%"><span>${count}</span></div></div></div>`;
+    container.innerHTML += `<div class="bar-row clickable" onclick="drillDown('owner','${owner}')"><div class="bar-label">${owner}</div><div class="bar-track"><div class="bar-fill ${colors[i % 3]}" style="width:${pct}%"><span>${count}</span></div></div></div>`;
   });
 }
 
@@ -900,7 +1222,7 @@ function buildPartChart() {
   const container = document.getElementById('part-chart');
   const colors = ['navy-bar', 'teal-bar', 'orange-bar'];
   sorted.forEach(([part, count], i) => {
-    container.innerHTML += `<div class="bar-row"><div class="bar-label">${partLabels[part] || part}</div><div class="bar-track"><div class="bar-fill ${colors[i % 3]}" style="width:${(count / max * 100).toFixed(0)}%"><span>${count}</span></div></div></div>`;
+    container.innerHTML += `<div class="bar-row clickable" onclick="drillDown('part','${part}')"><div class="bar-label">${partLabels[part] || part}</div><div class="bar-track"><div class="bar-fill ${colors[i % 3]}" style="width:${(count / max * 100).toFixed(0)}%"><span>${count}</span></div></div></div>`;
   });
 }
 
@@ -912,7 +1234,7 @@ function buildStatusChart() {
   const container = document.getElementById('status-chart');
   const max = Math.max(...Object.values(counts));
   Object.entries(counts).forEach(([status, count]) => {
-    container.innerHTML += `<div class="bar-row"><div class="bar-label">${labels[status]}</div><div class="bar-track"><div class="bar-fill ${barColors[status]}" style="width:${(count / max * 100).toFixed(0)}%"><span>${count}</span></div></div></div>`;
+    container.innerHTML += `<div class="bar-row clickable" onclick="drillDown('status','${status}')"><div class="bar-label">${labels[status]}</div><div class="bar-track"><div class="bar-fill ${barColors[status]}" style="width:${(count / max * 100).toFixed(0)}%"><span>${count}</span></div></div></div>`;
   });
 }
 
