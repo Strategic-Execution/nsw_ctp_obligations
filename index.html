@@ -4,1241 +4,319 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NSW CTP Obligations Dashboard — IAG</title>
+<title>NSW CTP Full Obligations Register — IAG</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --navy: #1A2B5E;
-  --navy-dark: #0F1A3A;
-  --navy-light: #2A3D72;
-  --teal: #2B9BB8;
-  --teal-light: #3DB8D8;
-  --teal-glow: rgba(43,155,184,0.15);
-  --orange: #E8713A;
-  --orange-light: #F09060;
-  --white: #FFFFFF;
-  --off-white: #F4F6FA;
-  --grey-100: #E8ECF2;
-  --grey-200: #CDD3DE;
-  --grey-300: #9BA4B5;
-  --grey-700: #3A4255;
-  --new-green: #10B981;
-  --new-green-bg: rgba(16,185,129,0.08);
-  --amended-amber: #F59E0B;
-  --amended-amber-bg: rgba(245,158,11,0.08);
-  --pending-blue: #6366F1;
-  --pending-blue-bg: rgba(99,102,241,0.08);
-  --red-flag: #EF4444;
-  --red-flag-bg: rgba(239,68,68,0.08);
-  --shadow-sm: 0 1px 3px rgba(15,26,58,0.08);
-  --shadow-md: 0 4px 16px rgba(15,26,58,0.1);
-  --shadow-lg: 0 12px 40px rgba(15,26,58,0.12);
-  --radius: 12px;
-  --radius-sm: 8px;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: 'DM Sans', -apple-system, sans-serif;
-  background: var(--off-white);
-  color: var(--grey-700);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-}
-
-/* ─── HEADER ─── */
-.header {
-  background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 50%, var(--navy-light) 100%);
-  padding: 32px 40px 28px;
-  position: relative;
-  overflow: hidden;
-}
-.header::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  right: -10%;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, var(--teal-glow) 0%, transparent 70%);
-  pointer-events: none;
-}
-.header-content {
-  position: relative;
-  z-index: 1;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-.header h1 {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--white);
-  letter-spacing: -0.5px;
-}
-.header h1 span { color: var(--teal-light); }
-.header-sub {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-top: 8px;
-  font-size: 14px;
-  color: var(--grey-200);
-}
-.header-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 10px;
-  background: rgba(43,155,184,0.2);
-  border: 1px solid rgba(43,155,184,0.3);
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--teal-light);
-}
-.dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
-.dot-green { background: var(--new-green); }
-.dot-amber { background: var(--amended-amber); }
-
-/* ─── LAYOUT ─── */
-.container {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 24px 40px 60px;
-}
-
-/* ─── STATS ROW ─── */
-.stats-row {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 16px;
-  margin-bottom: 28px;
-}
-.stat-card {
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 20px;
-  box-shadow: var(--shadow-sm);
-  border-left: 4px solid var(--grey-200);
-  transition: transform 0.2s, box-shadow 0.2s;
-  cursor: default;
-}
-.stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-.stat-card.navy { border-left-color: var(--navy); }
-.stat-card.teal { border-left-color: var(--teal); }
-.stat-card.green { border-left-color: var(--new-green); }
-.stat-card.amber { border-left-color: var(--amended-amber); }
-.stat-card.purple { border-left-color: var(--pending-blue); }
-.stat-num { font-size: 36px; font-weight: 700; color: var(--navy); line-height: 1; }
-.stat-label { font-size: 13px; color: var(--grey-300); margin-top: 4px; font-weight: 500; }
-
-/* ─── TAB BAR ─── */
-.tab-bar {
-  display: flex;
-  gap: 4px;
-  background: var(--white);
-  border-radius: var(--radius);
-  padding: 4px;
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 20px;
-  overflow-x: auto;
-}
-.tab-btn {
-  padding: 10px 18px;
-  border: none;
-  background: transparent;
-  color: var(--grey-300);
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s;
-}
-.tab-btn:hover { color: var(--navy); background: var(--off-white); }
-.tab-btn.active { background: var(--navy); color: var(--white); }
-.tab-btn .count {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 22px;
-  height: 20px;
-  padding: 0 6px;
-  margin-left: 6px;
-  border-radius: 10px;
-  font-size: 11px;
-  font-weight: 700;
-}
-.tab-btn .count { background: var(--grey-100); color: var(--grey-700); }
-.tab-btn.active .count { background: rgba(255,255,255,0.2); color: var(--white); }
-
-/* ─── FILTER BAR ─── */
-.filter-bar {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-.search-box {
-  flex: 1;
-  min-width: 250px;
-  position: relative;
-}
-.search-box input {
-  width: 100%;
-  padding: 10px 14px 10px 38px;
-  border: 2px solid var(--grey-100);
-  border-radius: var(--radius-sm);
-  font-family: inherit;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
-  background: var(--white);
-}
-.search-box input:focus { border-color: var(--teal); }
-.search-box::before {
-  content: '⌕';
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 18px;
-  color: var(--grey-300);
-}
-.filter-select {
-  padding: 10px 14px;
-  border: 2px solid var(--grey-100);
-  border-radius: var(--radius-sm);
-  font-family: inherit;
-  font-size: 13px;
-  background: var(--white);
-  color: var(--grey-700);
-  outline: none;
-  cursor: pointer;
-  min-width: 140px;
-}
-.filter-select:focus { border-color: var(--teal); }
-
-/* ─── OBLIGATIONS TABLE ─── */
-.table-wrap {
-  background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-}
-.table-scroll { overflow-x: auto; }
-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-thead th {
-  background: var(--navy);
-  color: var(--white);
-  padding: 12px 14px;
-  text-align: left;
-  font-weight: 600;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-  white-space: nowrap;
-}
-tbody td {
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--grey-100);
-  vertical-align: top;
-  max-width: 350px;
-}
-tbody tr { transition: background 0.15s; }
-tbody tr:hover { background: var(--off-white); }
-tbody tr.status-new { background: var(--new-green-bg); }
-tbody tr.status-new:hover { background: rgba(16,185,129,0.14); }
-tbody tr.status-amended { background: var(--amended-amber-bg); }
-tbody tr.status-amended:hover { background: rgba(245,158,11,0.14); }
-tbody tr.status-pending { background: var(--pending-blue-bg); }
-tbody tr.status-pending:hover { background: rgba(99,102,241,0.14); }
-.id-cell {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--navy);
-  white-space: nowrap;
-}
-.ref-cell {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: var(--grey-300);
-  white-space: nowrap;
-}
-.owner-badge {
-  display: inline-block;
-  padding: 2px 10px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-.owner-Claims { background: #DBEAFE; color: #1E40AF; }
-.owner-Legal { background: #FCE7F3; color: #9D174D; }
-.owner-Compliance { background: #FEF3C7; color: #92400E; }
-.owner-Finance { background: #D1FAE5; color: #065F46; }
-.owner-Underwriting { background: #E0E7FF; color: #3730A3; }
-.owner-Operations { background: #FDE68A; color: #78350F; }
-.owner-Pricing { background: #CFFAFE; color: #155E75; }
-.owner-Privacy { background: #F3E8FF; color: #6B21A8; }
-.owner-default { background: var(--grey-100); color: var(--grey-700); }
-
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 10px;
-  border-radius: 12px;
-  font-size: 11px;
-  font-weight: 600;
-  white-space: nowrap;
-}
-.badge-original { background: var(--grey-100); color: var(--grey-300); }
-.badge-new { background: rgba(16,185,129,0.15); color: #059669; }
-.badge-amended { background: rgba(245,158,11,0.15); color: #D97706; }
-.badge-pending { background: rgba(99,102,241,0.15); color: #4F46E5; }
-
-/* ─── CHARTS PANEL ─── */
-.charts-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  margin-bottom: 28px;
-}
-.chart-card {
-  background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  padding: 24px;
-}
-.chart-card h3 {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--navy);
-  margin-bottom: 16px;
-}
-.bar-chart { display: flex; flex-direction: column; gap: 10px; }
-.bar-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.bar-label {
-  width: 110px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--grey-700);
-  text-align: right;
-  flex-shrink: 0;
-}
-.bar-track {
-  flex: 1;
-  height: 28px;
-  background: var(--grey-100);
-  border-radius: 6px;
-  overflow: hidden;
-  position: relative;
-}
-.bar-fill {
-  height: 100%;
-  border-radius: 6px;
-  transition: width 0.8s cubic-bezier(0.22,1,0.36,1);
-  display: flex;
-  align-items: center;
-  padding-left: 8px;
-}
-.bar-fill span {
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--white);
-}
-.bar-fill.navy-bar { background: linear-gradient(90deg, var(--navy), var(--navy-light)); }
-.bar-fill.teal-bar { background: linear-gradient(90deg, var(--teal), var(--teal-light)); }
-.bar-fill.orange-bar { background: linear-gradient(90deg, var(--orange), var(--orange-light)); }
-
-/* Timeline */
-.timeline { position: relative; padding-left: 24px; }
-.timeline::before {
-  content: '';
-  position: absolute;
-  left: 8px;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: var(--grey-100);
-}
-.tl-item {
-  position: relative;
-  padding-bottom: 20px;
-}
-.tl-item::before {
-  content: '';
-  position: absolute;
-  left: -20px;
-  top: 4px;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--teal);
-  border: 2px solid var(--white);
-  box-shadow: 0 0 0 2px var(--teal);
-}
-.tl-item.action::before { background: var(--red-flag); box-shadow: 0 0 0 2px var(--red-flag); }
-.tl-item.monitor::before { background: var(--pending-blue); box-shadow: 0 0 0 2px var(--pending-blue); }
-.tl-date { font-size: 11px; font-weight: 700; color: var(--teal); text-transform: uppercase; letter-spacing: 0.5px; }
-.tl-item.action .tl-date { color: var(--red-flag); }
-.tl-item.monitor .tl-date { color: var(--pending-blue); }
-.tl-title { font-size: 13px; font-weight: 600; color: var(--navy); margin-top: 2px; }
-.tl-desc { font-size: 12px; color: var(--grey-300); margin-top: 2px; }
-
-/* ─── ENFORCEMENT ─── */
-.enforcement-cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-.enforce-card {
-  background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  padding: 20px;
-  border-left: 4px solid var(--red-flag);
-}
-.enforce-card h4 { font-size: 14px; color: var(--navy); font-weight: 700; }
-.enforce-card .penalty { font-size: 28px; font-weight: 700; color: var(--red-flag); margin: 6px 0; }
-.enforce-card p { font-size: 12px; color: var(--grey-300); line-height: 1.5; }
-
-/* ─── LEGEND ─── */
-.legend {
-  display: flex;
-  gap: 20px;
-  padding: 12px 20px;
-  background: var(--white);
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-sm);
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--grey-700);
-}
-.legend-swatch {
-  width: 14px;
-  height: 14px;
-  border-radius: 4px;
-}
-.swatch-original { background: var(--grey-100); }
-.swatch-new { background: rgba(16,185,129,0.3); border: 1px solid var(--new-green); }
-.swatch-amended { background: rgba(245,158,11,0.3); border: 1px solid var(--amended-amber); }
-.swatch-pending { background: rgba(99,102,241,0.3); border: 1px solid var(--pending-blue); }
-
-/* ─── FOOTER ─── */
-.footer {
-  text-align: center;
-  padding: 20px;
-  font-size: 12px;
-  color: var(--grey-300);
-  border-top: 1px solid var(--grey-100);
-  margin-top: 40px;
-}
-
-/* ─── CLICKABLE ELEMENTS ─── */
-.stat-card.clickable { cursor: pointer; position: relative; }
-.stat-card.clickable::after {
-  content: '→';
-  position: absolute;
-  top: 12px;
-  right: 14px;
-  font-size: 16px;
-  color: var(--grey-200);
-  transition: color 0.2s, transform 0.2s;
-}
-.stat-card.clickable:hover::after { color: var(--teal); transform: translateX(3px); }
-.stat-card.clickable:hover { box-shadow: var(--shadow-lg); border-left-width: 6px; }
-
-.bar-row.clickable { cursor: pointer; border-radius: 6px; padding: 2px 0; transition: background 0.15s; }
-.bar-row.clickable:hover { background: var(--off-white); }
-.bar-row.clickable .bar-fill { position: relative; }
-.bar-row.clickable:hover .bar-fill { filter: brightness(1.1); }
-
-tbody tr.clickable-row { cursor: pointer; }
-tbody tr.clickable-row:hover { background: rgba(43,155,184,0.06) !important; }
-
-/* ─── BREADCRUMB ─── */
-.breadcrumb {
-  display: none;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  font-size: 13px;
-  color: var(--grey-300);
-}
-.breadcrumb.visible { display: flex; }
-.breadcrumb a {
-  color: var(--teal);
-  text-decoration: none;
-  font-weight: 600;
-  cursor: pointer;
-  transition: color 0.2s;
-}
-.breadcrumb a:hover { color: var(--navy); text-decoration: underline; }
-.breadcrumb .sep { color: var(--grey-200); }
-.breadcrumb .current { color: var(--navy); font-weight: 600; }
-
-/* ─── DETAIL PANEL ─── */
-.detail-overlay {
-  display: none;
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(15,26,58,0.4);
-  z-index: 100;
-  animation: fadeIn 0.2s ease;
-}
-.detail-overlay.open { display: block; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-
-.detail-panel {
-  position: fixed;
-  top: 0; right: 0;
-  width: min(560px, 90vw);
-  height: 100vh;
-  background: var(--white);
-  box-shadow: -8px 0 40px rgba(15,26,58,0.15);
-  z-index: 101;
-  display: none;
-  flex-direction: column;
-  animation: slideIn 0.25s ease;
-}
-.detail-panel.open { display: flex; }
-
-.detail-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--grey-100);
-  background: var(--off-white);
-}
-.detail-header h2 {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--navy);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-.detail-close {
-  width: 36px; height: 36px;
-  border: none;
-  background: var(--white);
-  border-radius: 8px;
-  font-size: 20px;
-  color: var(--grey-300);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s, color 0.15s;
-}
-.detail-close:hover { background: var(--grey-100); color: var(--navy); }
-
-.detail-body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px;
-}
-.detail-section { margin-bottom: 20px; }
-.detail-section h4 {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--grey-300);
-  margin-bottom: 6px;
-}
-.detail-section p, .detail-section div {
-  font-size: 14px;
-  color: var(--grey-700);
-  line-height: 1.6;
-}
-.detail-field-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-.detail-nav {
-  display: flex;
-  justify-content: space-between;
-  padding: 16px 24px;
-  border-top: 1px solid var(--grey-100);
-  background: var(--off-white);
-}
-.detail-nav button {
-  padding: 8px 16px;
-  border: 2px solid var(--grey-100);
-  background: var(--white);
-  border-radius: var(--radius-sm);
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--grey-700);
-  cursor: pointer;
-  transition: all 0.15s;
-}
-.detail-nav button:hover { border-color: var(--teal); color: var(--teal); }
-.detail-nav button:disabled { opacity: 0.3; cursor: not-allowed; }
-.detail-nav button:disabled:hover { border-color: var(--grey-100); color: var(--grey-700); }
-
-/* ─── PANEL VISIBILITY ─── */
-.panel { display: none; }
-.panel.active { display: block; }
-
-/* ─── RESPONSIVE ─── */
-@media (max-width: 900px) {
-  .stats-row { grid-template-columns: repeat(3, 1fr); }
-  .charts-row, .enforcement-cards { grid-template-columns: 1fr; }
-  .container { padding: 16px; }
-  .header { padding: 24px 16px 20px; }
-}
-@media (max-width: 600px) {
-  .stats-row { grid-template-columns: repeat(2, 1fr); }
-  .filter-bar { flex-direction: column; }
-  .search-box { min-width: 100%; }
-}
+:root{--navy:#1A2B5E;--navy-dark:#0F1A3A;--navy-light:#2A3D72;--teal:#2B9BB8;--teal-light:#3DB8D8;--orange:#E8713A;--white:#FFF;--off-white:#F4F6FA;--g100:#E8ECF2;--g200:#CDD3DE;--g300:#9BA4B5;--g700:#3A4255;--green:#10B981;--green-bg:rgba(16,185,129,.08);--amber:#F59E0B;--amber-bg:rgba(245,158,11,.08);--purple:#6366F1;--purple-bg:rgba(99,102,241,.08);--radius:12px;--radius-sm:8px;--shadow-sm:0 1px 3px rgba(15,26,58,.08);--shadow-md:0 4px 16px rgba(15,26,58,.1)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',-apple-system,sans-serif;background:var(--off-white);color:var(--g700);line-height:1.5;-webkit-font-smoothing:antialiased}
+.hdr{background:linear-gradient(135deg,var(--navy-dark),var(--navy) 50%,var(--navy-light));padding:28px 32px 24px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-50%;right:-10%;width:500px;height:500px;background:radial-gradient(circle,rgba(43,155,184,.15),transparent 70%);pointer-events:none}
+.hdr-c{position:relative;z-index:1;max-width:1440px;margin:0 auto}
+.hdr h1{font-size:24px;font-weight:700;color:var(--white);letter-spacing:-.5px}
+.hdr h1 span{color:var(--teal-light)}
+.hdr-sub{display:flex;align-items:center;gap:12px;margin-top:6px;font-size:13px;color:var(--g200);flex-wrap:wrap}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 10px;background:rgba(43,155,184,.2);border:1px solid rgba(43,155,184,.3);border-radius:20px;font-size:11px;font-weight:600;color:var(--teal-light)}
+.ctr{max-width:1440px;margin:0 auto;padding:20px 32px 48px}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px}
+.st{background:var(--white);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow-sm);border-left:4px solid var(--g200);transition:transform .2s}
+.st:hover{transform:translateY(-2px)}
+.st.ny{border-left-color:var(--navy)}.st.tl{border-left-color:var(--teal)}.st.gn{border-left-color:var(--green)}.st.am{border-left-color:var(--amber)}.st.pu{border-left-color:var(--purple)}.st.or{border-left-color:var(--orange)}
+.st-n{font-size:32px;font-weight:700;color:var(--navy);line-height:1}
+.st-l{font-size:11px;color:var(--g300);margin-top:2px;font-weight:500}
+.tabs{display:flex;gap:3px;background:var(--white);border-radius:var(--radius);padding:3px;box-shadow:var(--shadow-sm);margin-bottom:16px;overflow-x:auto}
+.tab{padding:8px 16px;border:none;background:transparent;color:var(--g300);font-family:inherit;font-size:13px;font-weight:600;border-radius:var(--radius-sm);cursor:pointer;white-space:nowrap;transition:.2s}
+.tab:hover{color:var(--navy);background:var(--off-white)}
+.tab.on{background:var(--navy);color:var(--white)}
+.tab .cnt{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:18px;padding:0 5px;margin-left:5px;border-radius:9px;font-size:10px;font-weight:700;background:var(--g100);color:var(--g700)}
+.tab.on .cnt{background:rgba(255,255,255,.2);color:var(--white)}
+.pnl{display:none}.pnl.on{display:block}
+.fbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.sbox{flex:1;min-width:220px;position:relative}
+.sbox input{width:100%;padding:8px 12px 8px 34px;border:2px solid var(--g100);border-radius:var(--radius-sm);font-family:inherit;font-size:13px;outline:none;background:var(--white)}
+.sbox input:focus{border-color:var(--teal)}
+.sbox::before{content:'\2315';position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--g300)}
+.sel{padding:8px 12px;border:2px solid var(--g100);border-radius:var(--radius-sm);font-family:inherit;font-size:12px;background:var(--white);color:var(--g700);outline:none;cursor:pointer;min-width:130px}
+.sel:focus{border-color:var(--teal)}
+.tw{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden}
+.ts{overflow-x:auto;max-height:70vh;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{background:var(--navy);color:var(--white);padding:10px 12px;text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px;position:sticky;top:0;z-index:2;white-space:nowrap}
+tbody td{padding:10px 12px;border-bottom:1px solid var(--g100);vertical-align:top}
+tbody tr{transition:background .15s}
+tbody tr:hover{background:var(--off-white)}
+tr.s-new{background:var(--green-bg)}tr.s-new:hover{background:rgba(16,185,129,.14)}
+tr.s-amd{background:var(--amber-bg)}tr.s-amd:hover{background:rgba(245,158,11,.14)}
+tr.s-pnd{background:var(--purple-bg)}tr.s-pnd:hover{background:rgba(99,102,241,.14)}
+tr.grp-row td{background:var(--teal);color:var(--white);font-weight:700;font-size:13px;padding:8px 12px}
+.idc{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;color:var(--navy);white-space:nowrap}
+.refc{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--g300);white-space:nowrap}
+.vc{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;white-space:nowrap}
+.vc-csb{background:#DBEAFE;color:#1E40AF}.vc-cld{background:#FCE7F3;color:#9D174D}
+.vc-rc{background:#FEF3C7;color:#92400E}.vc-pa{background:#CFFAFE;color:#155E75}
+.vc-dpi{background:#FDE68A;color:#78350F}.vc-fl{background:#D1FAE5;color:#065F46}
+.vc-dr{background:#E0E7FF;color:#3730A3}.vc-up{background:#F3E8FF;color:#6B21A8}
+.vc-cf{background:#FFEDD5;color:#9A3412}.vc-pd{background:#F1F5F9;color:#475569}
+.vc-lg{background:#F5F5F5;color:#737373}
+.sb{display:inline-flex;align-items:center;gap:3px;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:600;white-space:nowrap}
+.sb-orig{background:var(--g100);color:var(--g300)}
+.sb-new{background:rgba(16,185,129,.15);color:#059669}
+.sb-amd{background:rgba(245,158,11,.15);color:#D97706}
+.sb-pnd{background:rgba(99,102,241,.15);color:#4F46E5}
+.legend{display:flex;gap:16px;padding:10px 16px;background:var(--white);border-radius:var(--radius-sm);box-shadow:var(--shadow-sm);margin-bottom:16px;flex-wrap:wrap}
+.lg-i{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:var(--g700)}
+.lg-s{width:12px;height:12px;border-radius:3px}
+.sw-o{background:var(--g100)}.sw-n{background:rgba(16,185,129,.3);border:1px solid var(--green)}.sw-a{background:rgba(245,158,11,.3);border:1px solid var(--amber)}.sw-p{background:rgba(99,102,241,.3);border:1px solid var(--purple)}
+.charts{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.ccard{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm);padding:20px}
+.ccard h3{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:12px}
+.bar-c{display:flex;flex-direction:column;gap:8px}
+.bar-r{display:flex;align-items:center;gap:8px;cursor:pointer;padding:3px 4px;border-radius:6px;transition:background .15s}
+.bar-r:hover{background:rgba(43,155,184,.06)}
+.bar-l{width:200px;font-size:11px;font-weight:600;color:var(--g700);text-align:right;flex-shrink:0;white-space:nowrap}
+.bar-t{flex:1;height:28px;background:var(--g100);border-radius:5px;overflow:visible;position:relative}
+.bar-f{height:100%;border-radius:5px;display:flex;align-items:center;padding-left:8px;transition:width .8s cubic-bezier(.22,1,.36,1);position:relative;min-width:0}
+.bar-f span{font-size:11px;font-weight:700;color:var(--white);white-space:nowrap}
+.bar-f.narrow span{color:var(--navy);position:relative;left:4px}
+.bf-ny{background:linear-gradient(90deg,var(--navy),var(--navy-light))}
+.bf-tl{background:linear-gradient(90deg,var(--teal),var(--teal-light))}
+.bf-or{background:linear-gradient(90deg,var(--orange),#F09060)}
+.vc-filter{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;padding:14px 16px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow-sm)}
+.vc-chip{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;border:2px solid var(--g100);background:var(--white);color:var(--g700);user-select:none}
+.vc-chip:hover{border-color:var(--teal);background:rgba(43,155,184,.05)}
+.vc-chip.on{border-color:var(--navy);background:var(--navy);color:var(--white)}
+.vc-chip .chip-ct{display:inline-block;margin-left:4px;font-size:10px;opacity:.7}
+.vc-chip-all{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:2px solid var(--teal);background:var(--teal);color:var(--white);transition:all .2s;user-select:none}
+.vc-chip-all:hover{background:var(--teal-light)}
+.vc-chip-all.off{background:var(--white);color:var(--teal);border-color:var(--teal)}
+.rc{text-align:right;padding:10px 16px;font-size:11px;color:var(--g300)}
+.footer{text-align:center;padding:16px;font-size:11px;color:var(--g300);border-top:1px solid var(--g100);margin-top:32px}
+@media(max-width:900px){.stats{grid-template-columns:repeat(3,1fr)}.charts{grid-template-columns:1fr}.ctr{padding:12px}}
+@media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}.fbar{flex-direction:column}.sbox{min-width:100%}}
 </style>
 </head>
 <body>
-
-<div class="header">
-  <div class="header-content">
-    <h1>NSW CTP Obligations <span>Compliance Dashboard</span></h1>
-    <div class="header-sub">
-      <span>Motor Accidents Injuries Act 2017 (NSW)</span>
-      <span>|</span>
-      <span>Insurance Australia Group</span>
-      <span class="header-badge"><span class="dot dot-green"></span> Updated 10 Apr 2026</span>
-      <span class="header-badge"><span class="dot dot-amber"></span> MAG v10.1 — 12 Dec 2025</span>
-    </div>
-  </div>
+<div class="hdr"><div class="hdr-c">
+<h1>NSW CTP <span>Full Obligations Register</span></h1>
+<div class="hdr-sub">
+<span>Motor Accidents Injuries Act 2017 + MAG v10.1 + CTP Care v1.1</span><span>|</span>
+<span>Insurance Australia Group</span>
+<span class="badge">155 Obligations Mapped</span>
+<span class="badge">Current as at Apr 2026</span>
+</div></div></div>
+<div class="ctr">
+<div class="stats">
+<div class="st ny"><div class="st-n">155</div><div class="st-l">Total Obligations</div></div>
+<div class="st tl"><div class="st-n" style="color:var(--teal)">78</div><div class="st-l">Act Obligations</div></div>
+<div class="st or"><div class="st-n" style="color:var(--orange)">61</div><div class="st-l">MAG v10.1 Clauses</div></div>
+<div class="st gn"><div class="st-n" style="color:var(--green)">13</div><div class="st-l">CTP Care v1.1</div></div>
+<div class="st am"><div class="st-n" style="color:var(--amber)">19</div><div class="st-l">New / Amended</div></div>
+<div class="st pu"><div class="st-n" style="color:var(--purple)">2</div><div class="st-l">Pending</div></div>
+</div>
+<div class="tabs">
+<button class="tab on" data-tab="overview" onclick="sw('overview')">Overview</button>
+<button class="tab" data-tab="all" onclick="sw('all')">All Obligations <span class="cnt">155</span></button>
+<button class="tab" data-tab="chain" onclick="sw('chain')">By Value Chain</button>
+<button class="tab" data-tab="changes" onclick="sw('changes')">Changes &amp; New <span class="cnt">23</span></button>
 </div>
 
-<div class="container">
-
-  <!-- STATS ROW -->
-  <div class="stats-row">
-    <div class="stat-card navy clickable" onclick="drillDown('all')">
-      <div class="stat-num">140</div>
-      <div class="stat-label">Total Obligations</div>
-    </div>
-    <div class="stat-card green clickable" onclick="drillDown('status','new')">
-      <div class="stat-num" style="color:var(--new-green)">8</div>
-      <div class="stat-label">New (Post Early-2025)</div>
-    </div>
-    <div class="stat-card amber clickable" onclick="drillDown('status','amended')">
-      <div class="stat-num" style="color:var(--amended-amber)">7</div>
-      <div class="stat-label">Amended</div>
-    </div>
-    <div class="stat-card purple clickable" onclick="drillDown('status','pending')">
-      <div class="stat-num" style="color:var(--pending-blue)">2</div>
-      <div class="stat-label">Pending Legislation</div>
-    </div>
-    <div class="stat-card teal">
-      <div class="stat-num" style="color:var(--teal)">6</div>
-      <div class="stat-label">Licensed Insurers</div>
-    </div>
-  </div>
-
-  <!-- TAB BAR -->
-  <div class="tab-bar">
-    <button class="tab-btn active" onclick="switchTab('overview')">Overview</button>
-    <button class="tab-btn" onclick="switchTab('obligations')">All Obligations <span class="count">140</span></button>
-    <button class="tab-btn" onclick="switchTab('changes')">Changes & New <span class="count">17</span></button>
-    <button class="tab-btn" onclick="switchTab('enforcement')">Enforcement</button>
-    <button class="tab-btn" onclick="switchTab('timeline')">Reform Timeline</button>
-  </div>
-
-  <!-- ═══ OVERVIEW PANEL ═══ -->
-  <div class="panel active" id="panel-overview">
-    <div class="charts-row">
-      <div class="chart-card">
-        <h3>Obligations by Owner</h3>
-        <div class="bar-chart" id="owner-chart"></div>
-      </div>
-      <div class="chart-card">
-        <h3>Obligations by Act Part</h3>
-        <div class="bar-chart" id="part-chart"></div>
-      </div>
-    </div>
-    <div class="charts-row">
-      <div class="chart-card">
-        <h3>Change Status Breakdown</h3>
-        <div class="bar-chart" id="status-chart"></div>
-      </div>
-      <div class="chart-card">
-        <h3>Key Regulatory Developments</h3>
-        <div class="timeline">
-          <div class="tl-item">
-            <div class="tl-date">28 Nov 2022</div>
-            <div class="tl-title">MAI Amendment Act — Stage 1</div>
-            <div class="tl-desc">Removed WPI internal review prerequisite; removed 20-month wait for damages</div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-date">1 Apr 2023</div>
-            <div class="tl-title">MAI Amendment Act — Stage 2</div>
-            <div class="tl-desc">"Threshold injury" replaces "minor injury"; benefits extended 26→52 weeks</div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-date">1 Mar 2024</div>
-            <div class="tl-title">SIRA Significant Matters Reporting</div>
-            <div class="tl-desc">New obligation for prompt escalation to SIRA</div>
-          </div>
-          <div class="tl-item action">
-            <div class="tl-date">15 Sep 2025</div>
-            <div class="tl-title">Motor Accident Guidelines v10</div>
-            <div class="tl-desc">6 new/amended clauses — Atwal duty, distressing content, earnings notices</div>
-          </div>
-          <div class="tl-item">
-            <div class="tl-date">12 Dec 2025</div>
-            <div class="tl-title">MAG v10.1 — Premium Updates</div>
-            <div class="tl-desc">2026 underwriting year premium parameters</div>
-          </div>
-          <div class="tl-item action">
-            <div class="tl-date">18 Feb 2026</div>
-            <div class="tl-title">Medical Dispute Definition (s 7.17)</div>
-            <div class="tl-desc">Extends to merit review determinations</div>
-          </div>
-          <div class="tl-item monitor">
-            <div class="tl-date">Pending</div>
-            <div class="tl-title">Micromobility Exclusion & Claim Farming Ban</div>
-            <div class="tl-desc">Two measures assented/introduced but not yet commenced</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ OBLIGATIONS PANEL ═══ -->
-  <div class="panel" id="panel-obligations">
-    <div class="breadcrumb" id="breadcrumb">
-      <a onclick="clearDrillDown()">Dashboard</a>
-      <span class="sep">›</span>
-      <span class="current" id="breadcrumb-label">All Obligations</span>
-    </div>
-    <div class="legend">
-      <div class="legend-item"><div class="legend-swatch swatch-original"></div> Original (validated)</div>
-      <div class="legend-item"><div class="legend-swatch swatch-new"></div> New obligation</div>
-      <div class="legend-item"><div class="legend-swatch swatch-amended"></div> Amended</div>
-      <div class="legend-item"><div class="legend-swatch swatch-pending"></div> Pending legislation</div>
-    </div>
-    <div class="filter-bar">
-      <div class="search-box">
-        <input type="text" id="search-input" placeholder="Search obligations…" oninput="filterTable()">
-      </div>
-      <select class="filter-select" id="filter-owner" onchange="filterTable()">
-        <option value="">All Owners</option>
-      </select>
-      <select class="filter-select" id="filter-part" onchange="filterTable()">
-        <option value="">All Parts</option>
-      </select>
-      <select class="filter-select" id="filter-status" onchange="filterTable()">
-        <option value="">All Statuses</option>
-        <option value="original">Original</option>
-        <option value="new">New</option>
-        <option value="amended">Amended</option>
-        <option value="pending">Pending</option>
-      </select>
-    </div>
-    <div class="table-wrap">
-      <div class="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Reference</th>
-              <th>Obligation</th>
-              <th>Trigger</th>
-              <th>Risk</th>
-              <th>Controls</th>
-              <th>Owner</th>
-              <th>Status</th>
-              <th>Effective</th>
-            </tr>
-          </thead>
-          <tbody id="obligations-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-    <div style="padding:14px 20px;font-size:12px;color:var(--grey-300)" id="result-count"></div>
-  </div>
-
-  <!-- ═══ CHANGES PANEL ═══ -->
-  <div class="panel" id="panel-changes">
-    <div class="legend">
-      <div class="legend-item"><div class="legend-swatch swatch-new"></div> New obligation</div>
-      <div class="legend-item"><div class="legend-swatch swatch-amended"></div> Amended</div>
-      <div class="legend-item"><div class="legend-swatch swatch-pending"></div> Pending legislation</div>
-    </div>
-    <div class="table-wrap">
-      <div class="table-scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Reference</th>
-              <th>Obligation</th>
-              <th>Owner</th>
-              <th>Status</th>
-              <th>Effective</th>
-            </tr>
-          </thead>
-          <tbody id="changes-tbody"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ ENFORCEMENT PANEL ═══ -->
-  <div class="panel" id="panel-enforcement">
-    <div class="enforcement-cards">
-      <div class="enforce-card">
-        <h4>Insurance Australia Limited (NRMA)</h4>
-        <div class="penalty">$10,000</div>
-        <p><strong>13 Dec 2024</strong> — Civil penalty under s 9.10(1)(a) for non-disclosure and incorrect application of demerit point loading on 48,000+ renewal policies, and mispricing on 21,000+ policies dating back to Oct 2018.</p>
-      </div>
-      <div class="enforce-card">
-        <h4>QBE Insurance Australia</h4>
-        <div class="penalty">$32,600</div>
-        <p><strong>5 Dec 2025</strong> — Civil penalty for prolonged delays paying treatment and care invoices from Nov 2023 to Aug 2025. Some providers ceased delivering care due to non-payment.</p>
-      </div>
-    </div>
-    <div class="charts-row">
-      <div class="chart-card">
-        <h3>SIRA Enforcement Metrics (Q4 2025)</h3>
-        <div class="bar-chart">
-          <div class="bar-row"><div class="bar-label">Open Remediation Plans</div><div class="bar-track"><div class="bar-fill navy-bar" style="width:75%"><span>12–18</span></div></div></div>
-          <div class="bar-row"><div class="bar-label">Letters of Compliance</div><div class="bar-track"><div class="bar-fill orange-bar" style="width:40%"><span>8 (Q4 record)</span></div></div></div>
-          <div class="bar-row"><div class="bar-label">Significant Matters</div><div class="bar-track"><div class="bar-fill teal-bar" style="width:50%"><span>19</span></div></div></div>
-          <div class="bar-row"><div class="bar-label">Open Fraud Investigations</div><div class="bar-track"><div class="bar-fill navy-bar" style="width:67%"><span>67</span></div></div></div>
-          <div class="bar-row"><div class="bar-label">Matters Before Court</div><div class="bar-track"><div class="bar-fill orange-bar" style="width:24%"><span>24</span></div></div></div>
-        </div>
-      </div>
-      <div class="chart-card">
-        <h3>ICCAP Compliance (Assurance Reviews)</h3>
-        <div style="text-align:center;padding:20px 0">
-          <div style="font-size:64px;font-weight:700;color:var(--navy)">81.3%</div>
-          <div style="font-size:14px;color:var(--grey-300);margin-top:4px">Average compliance score across insurers</div>
-          <div style="margin-top:16px;font-size:12px;color:var(--orange);font-weight:600">Self-reported compliance frequently exceeded observed compliance in file reviews</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ═══ TIMELINE PANEL ═══ -->
-  <div class="panel" id="panel-timeline">
-    <div class="chart-card">
-      <h3>Second Statutory Review — Outstanding Recommendations</h3>
-      <p style="font-size:13px;color:var(--grey-300);margin-bottom:16px">16 of 49 recommendations from the first statutory review (Clayton Utz / Deloitte, Nov 2021) remain unactioned. These are expected to be progressed in the second review commencing post-28 Nov 2025.</p>
-      <div class="table-wrap" style="box-shadow:none">
-        <table>
-          <thead><tr><th>Rec #</th><th>Recommendation</th><th>Impact Area</th><th>Status</th></tr></thead>
-          <tbody>
-            <tr><td>34</td><td>Remove "adjustment disorder" from threshold injury definition</td><td>Claims / Legal</td><td><span class="status-badge badge-pending">Unactioned</span></td></tr>
-            <tr><td>36</td><td>Allow NEL damages where WPI >10% regardless of threshold injury</td><td>Claims / Actuarial</td><td><span class="status-badge badge-pending">Unactioned</span></td></tr>
-            <tr><td>39</td><td>Independent assessment if insurer reverses threshold position after 18 months</td><td>Claims</td><td><span class="status-badge badge-pending">Unactioned</span></td></tr>
-            <tr><td>18</td><td>Reconsider 5% discount rate on future economic loss</td><td>Claims / Finance</td><td><span class="status-badge badge-pending">Unactioned</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    <div class="charts-row" style="margin-top:20px">
-      <div class="chart-card">
-        <h3>Pending Legislative Measures</h3>
-        <div class="timeline">
-          <div class="tl-item monitor">
-            <div class="tl-date">Assented — Not Commenced</div>
-            <div class="tl-title">Micromobility Exclusion (Act 2025 No 77, Sch 2)</div>
-            <div class="tl-desc">Will exclude e-scooter/e-bike-only accidents from CTP scope. Monitor for proclamation date.</div>
-          </div>
-          <div class="tl-item monitor">
-            <div class="tl-date">Before Parliament</div>
-            <div class="tl-title">Claim Farming Prohibition Bill 2025</div>
-            <div class="tl-desc">Three new offences, penalties up to $55,000. Introduced 19 Nov 2025, reviewed by Legislation Review Committee Feb 2026.</div>
-          </div>
-          <div class="tl-item monitor">
-            <div class="tl-date">Consultation 2026</div>
-            <div class="tl-title">Health Provider Regulation Review</div>
-            <div class="tl-desc">SIRA discussion paper on Certificate of Capacity/Fitness reform and provider regulation changes.</div>
-          </div>
-          <div class="tl-item monitor">
-            <div class="tl-date">Anticipated</div>
-            <div class="tl-title">Workers' Comp Medico-Legal Reforms → CTP Flow-Through</div>
-            <div class="tl-desc">WC reforms restricting independent medico-legal evidence expected to flow to CTP. Monitor Legislative Council committee.</div>
-          </div>
-        </div>
-      </div>
-      <div class="chart-card">
-        <h3>CTP Scheme Snapshot (June 2025)</h3>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px">
-          <div style="text-align:center;padding:16px;background:var(--off-white);border-radius:8px">
-            <div style="font-size:32px;font-weight:700;color:var(--navy)">$536</div>
-            <div style="font-size:12px;color:var(--grey-300)">Avg CTP Premium</div>
-            <div style="font-size:11px;color:var(--new-green);font-weight:600;margin-top:2px">43% below pre-2017</div>
-          </div>
-          <div style="text-align:center;padding:16px;background:var(--off-white);border-radius:8px">
-            <div style="font-size:32px;font-weight:700;color:var(--navy)">$542.9M</div>
-            <div style="font-size:12px;color:var(--grey-300)">Total TEPL Recovered</div>
-            <div style="font-size:11px;color:var(--teal);font-weight:600;margin-top:2px">No recovery in 2025</div>
-          </div>
-          <div style="text-align:center;padding:16px;background:var(--off-white);border-radius:8px">
-            <div style="font-size:32px;font-weight:700;color:var(--navy)">6</div>
-            <div style="font-size:12px;color:var(--grey-300)">Licensed Insurers</div>
-            <div style="font-size:11px;color:var(--grey-300);margin-top:2px">AAMI, GIO, Allianz, NRMA, QBE, Youi</div>
-          </div>
-          <div style="text-align:center;padding:16px;background:var(--off-white);border-radius:8px">
-            <div style="font-size:32px;font-weight:700;color:var(--navy)">+7%</div>
-            <div style="font-size:12px;color:var(--grey-300)">Premium Growth YoY</div>
-            <div style="font-size:11px;color:var(--orange);font-weight:600;margin-top:2px">52-week benefits + medical inflation</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- DETAIL PANEL -->
-  <div class="detail-overlay" id="detail-overlay" onclick="closeDetail()"></div>
-  <div class="detail-panel" id="detail-panel">
-    <div class="detail-header">
-      <h2 id="detail-title"></h2>
-      <button class="detail-close" onclick="closeDetail()" title="Close">✕</button>
-    </div>
-    <div class="detail-body" id="detail-body"></div>
-    <div class="detail-nav">
-      <button onclick="navigateDetail(-1)" id="detail-prev">← Previous</button>
-      <button onclick="navigateDetail(1)" id="detail-next">Next →</button>
-    </div>
-  </div>
-
-  <div class="footer">
-    NSW CTP Obligations Compliance Dashboard &mdash; Insurance Australia Group &mdash; Generated 10 April 2026<br>
-    <span style="font-size:11px">Sources: Motor Accidents Injuries Act 2017 (NSW), SIRA Motor Accident Guidelines v10.1, SIRA Regulatory Activity Reports, AustLII</span>
-  </div>
+<div class="pnl on" id="p-overview">
+<div class="charts">
+<div class="ccard"><h3>By Value Chain Segment</h3><div class="bar-c" id="ch-chain"></div></div>
+<div class="ccard"><h3>By Source Instrument</h3><div class="bar-c" id="ch-source"></div></div>
+</div>
+<div class="charts" style="grid-template-columns:1fr 1fr 1fr">
+<div class="ccard"><h3>Act — By Part</h3><div class="bar-c" id="ch-act"></div></div>
+<div class="ccard"><h3>MAG v10.1 — By Part</h3><div class="bar-c" id="ch-mag"></div></div>
+<div class="ccard"><h3>Other Instruments</h3><div class="bar-c" id="ch-other"></div></div>
+</div>
 </div>
 
+<div class="pnl" id="p-all">
+<div class="legend">
+<div class="lg-i"><div class="lg-s sw-o"></div>Original</div>
+<div class="lg-i"><div class="lg-s sw-n"></div>New</div>
+<div class="lg-i"><div class="lg-s sw-a"></div>Amended</div>
+<div class="lg-i"><div class="lg-s sw-p"></div>Pending</div>
+</div>
+<div class="fbar">
+<div class="sbox"><input type="text" id="q" placeholder="Search obligations..." oninput="filt()"></div>
+<select class="sel" id="f-src" onchange="filt()"><option value="">All Sources</option></select>
+<select class="sel" id="f-vc" onchange="filt()"><option value="">All Value Chain</option></select>
+<select class="sel" id="f-st" onchange="filt()"><option value="">All Statuses</option><option value="new">New</option><option value="amended">Amended</option><option value="pending">Pending</option><option value="original">Original</option></select>
+<select class="sel" id="f-part" onchange="filt()"><option value="">All Parts</option></select>
+</div>
+<div class="tw"><div class="ts">
+<table><thead><tr>
+<th>ID</th><th>Source</th><th>Division</th><th>Part</th><th>Reference</th><th>Obligation</th><th>Value Chain</th><th>Type</th><th>Status</th><th>Effective</th>
+</tr></thead><tbody id="tb"></tbody></table>
+</div></div>
+<div class="rc" id="rc"></div>
+</div>
+
+<div class="pnl" id="p-chain">
+<div class="vc-filter" id="vc-filter"></div>
+<div id="chain-tables"></div>
+</div>
+
+<div class="pnl" id="p-changes">
+<div class="legend">
+<div class="lg-i"><div class="lg-s sw-n"></div>New</div>
+<div class="lg-i"><div class="lg-s sw-a"></div>Amended</div>
+<div class="lg-i"><div class="lg-s sw-p"></div>Pending</div>
+</div>
+<div class="tw"><div class="ts">
+<table><thead><tr>
+<th>ID</th><th>Source</th><th>Division</th><th>Reference</th><th>Obligation</th><th>Value Chain</th><th>Status</th><th>Effective</th><th>Notes</th>
+</tr></thead><tbody id="ctb"></tbody></table>
+</div></div>
+</div>
+
+<div class="footer">NSW CTP Full Obligations Register &mdash; Insurance Australia Group &mdash; Generated April 2026<br>
+Sources: Motor Accidents Injuries Act 2017 (AustLII verified), MAG v10.1, CTP Care Guidelines v1.1, SIRA Regulatory Framework</div>
+</div>
 <script>
-// ─── DATA ───
-const DATA = {"obligations": [{"id": "P2\u201101", "ref": "s 2.1", "statement": "Ensure vehicles insured under issued third\u2011party policies meet statutory definition of \u201cinsured motor vehicle\u201d", "trigger": "Policy issuance / renewal", "risk": "Uninsured driving, scheme breach", "controls": "Underwriting validation rules", "evidence": "Policy system validation logs", "owner": "Underwriting", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201102", "ref": "s 2.2", "statement": "Apply statutory exceptions to compulsory insurance only where permitted", "trigger": "Vehicle classification", "risk": "Incorrect cover or premium", "controls": "Product rules engine", "evidence": "Vehicle type mapping", "owner": "Underwriting", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201103", "ref": "s 2.3", "statement": "Issue third\u2011party policies strictly in statutory form", "trigger": "All policies", "risk": "Policy unenforceable", "controls": "Approved policy wording", "evidence": "Policy documents", "owner": "Legal", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201104", "ref": "s 2.3", "statement": "Insure owners and all drivers (with or without consent)", "trigger": "Claim arises", "risk": "Improper denial", "controls": "Claims rules", "evidence": "Claims decisions", "owner": "Claims", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201105", "ref": "s 2.3", "statement": "Provide Australia\u2011wide cover as required", "trigger": "Use of vehicle", "risk": "Coverage gaps", "controls": "Policy scope controls", "evidence": "Policy wording", "owner": "Legal", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201106", "ref": "s 2.3", "statement": "Ensure policy wording does not restrict statutory cover", "trigger": "Policy drafting", "risk": "Regulatory breach", "controls": "Legal review", "evidence": "Legal sign\u2011off", "owner": "Legal", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201107", "ref": "s 2.5(1)", "statement": "Immediately issue certificate on receipt of premium", "trigger": "Premium payment", "risk": "Invalid registration", "controls": "Automated issuance", "evidence": "Certificate timestamp", "owner": "Operations", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201108", "ref": "s 2.5(2)", "statement": "Issue certificates to trader where trader\u2019s plate applies", "trigger": "Trader policies", "risk": "Coverage dispute", "controls": "Trader workflows", "evidence": "Certificate records", "owner": "Operations", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201109", "ref": "s 2.5(3)", "statement": "Treat issued certificate as legal policy issuance", "trigger": "Certificate issued", "risk": "Invalid cover", "controls": "System linkage", "evidence": "Policy register", "owner": "Operations", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201110", "ref": "s 2.5(4)", "statement": "Recognise TfNSW record as determinative insurer", "trigger": "Multiple certificates", "risk": "Disputed insurer", "controls": "TfNSW reconciliation", "evidence": "TfNSW feeds", "owner": "Operations", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201111", "ref": "s 2.7", "statement": "Be on risk only during statutory coverage periods", "trigger": "Registration cycle", "risk": "Incorrect liability", "controls": "Policy timing logic", "evidence": "Coverage dates", "owner": "Underwriting", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201112", "ref": "s 2.7", "statement": "Correctly manage insurer transitions at renewal", "trigger": "Renewal", "risk": "Dual or no cover", "controls": "Renewal engine", "evidence": "Renewal audit", "owner": "Underwriting", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201113", "ref": "s 2.8(1)", "statement": "Not cancel third\u2011party policies except as permitted", "trigger": "Any cancellation", "risk": "Illegal cancellation", "controls": "Cancellation controls", "evidence": "Cancellation logs", "owner": "Operations", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201114", "ref": "s 2.8(7)", "statement": "Notify owner before requesting registration suspension", "trigger": "Premium default", "risk": "Procedural breach", "controls": "Notice templates", "evidence": "Customer notices", "owner": "Operations", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201115", "ref": "s 2.8(6),(9)", "statement": "Obtain Authority approval before suspension/cancellation", "trigger": "Non\u2011payment", "risk": "Regulatory breach", "controls": "Approval workflow", "evidence": "Authority approval", "owner": "Compliance", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201116", "ref": "s 2.9", "statement": "Exclude workers compensation liabilities", "trigger": "Claim assessment", "risk": "Double insurance", "controls": "Claims assessment rules", "evidence": "Claim files", "owner": "Claims", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201117", "ref": "s 2.10", "statement": "Exclude terrorism\u2011related liabilities as defined", "trigger": "Claim cause", "risk": "Invalid denial", "controls": "Legal guidance", "evidence": "Claim decisions", "owner": "Legal", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201118", "ref": "s 2.11", "statement": "Indemnify insured persons for covered liabilities", "trigger": "Liability established", "risk": "Breach of Act", "controls": "Claims payment controls", "evidence": "Payment records", "owner": "Claims", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201119", "ref": "s 2.12(1)", "statement": "Treat policy as valid despite incorrect premium", "trigger": "Premium error", "risk": "Unlawful avoidance", "controls": "Policy validity rule", "evidence": "Policy status", "owner": "Underwriting", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201120", "ref": "s 2.12(2)", "statement": "Recover unpaid premiums as a debt", "trigger": "Underpayment", "risk": "Financial loss", "controls": "Debt recovery process", "evidence": "Recovery records", "owner": "Finance", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201121", "ref": "s 2.12(3)", "statement": "Limit recovery from false statements to statutory cap", "trigger": "Fraud", "risk": "Over\u2011recovery", "controls": "Recovery limits", "evidence": "Legal recovery files", "owner": "Legal", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201122", "ref": "s 2.14", "statement": "Maintain cover despite change of ownership", "trigger": "Sale/transfer", "risk": "Coverage lapse", "controls": "TfNSW updates", "evidence": "Policy continuity logs", "owner": "Operations", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201123", "ref": "s 2.15", "statement": "Act on TfNSW notifications of changed particulars", "trigger": "TfNSW update", "risk": "Incorrect premium", "controls": "Data feeds", "evidence": "TfNSW change logs", "owner": "Underwriting", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201124", "ref": "s 2.18", "statement": "Satisfy judgments entered against insured vehicles", "trigger": "Court judgment", "risk": "Enforcement action", "controls": "Legal payment process", "evidence": "Judgment payments", "owner": "Legal", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201125", "ref": "s 2.16", "statement": "Recover payments from unauthorised drivers (after paying claims)", "trigger": "Unauthorised use", "risk": "Scheme loss", "controls": "Recovery process", "evidence": "Recovery actions", "owner": "Legal", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201126", "ref": "s 2.20", "statement": "Not charge premiums unless filed and approved", "trigger": "Premium launch", "risk": "Illegal pricing", "controls": "Pricing governance", "evidence": "Filed premiums", "owner": "Pricing", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201127", "ref": "s 2.21", "statement": "File all premiums as required by Guidelines", "trigger": "Pricing cycle", "risk": "Licence breach", "controls": "Filing calendar", "evidence": "Authority receipts", "owner": "Pricing", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201128", "ref": "s 2.22", "statement": "Participate in rejection / arbitration process", "trigger": "Rejection", "risk": "Invalid pricing", "controls": "Arbitration procedures", "evidence": "Arbitration outcomes", "owner": "Pricing", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201129", "ref": "s 2.23", "statement": "Disclose profit margins and actuarial basis", "trigger": "Premium filing", "risk": "Transparency breach", "controls": "Actuarial sign\u2011off", "evidence": "Profit disclosures", "owner": "Pricing", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201130", "ref": "s 2.24", "statement": "Comply with risk equalisation arrangements", "trigger": "Scheme operation", "risk": "Licence breach", "controls": "Scheme settlements", "evidence": "Transfer statements", "owner": "Finance", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201131", "ref": "s 2.25", "statement": "Comply with premium / levy adjustments", "trigger": "Authority direction", "risk": "Regulatory action", "controls": "Adjustment controls", "evidence": "Fund payments", "owner": "Finance", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P2\u201132", "ref": "s 2.27+", "statement": "Act as agent where required for Nominal Defendant claims", "trigger": "ND claim", "risk": "Scheme failure", "controls": "ND handling process", "evidence": "ND claim files", "owner": "Claims", "part": "P2", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201101", "ref": "s 3.1", "statement": "Determine statutory benefits eligibility strictly in accordance with Part 3", "trigger": "Injury claim notification", "risk": "Incorrect benefit denial", "controls": "Eligibility assessment framework", "evidence": "Eligibility assessment record", "owner": "Claims", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201102", "ref": "s 3.2", "statement": "Apply statutory benefits regardless of fault, subject to Act limits", "trigger": "Any motor accident injury", "risk": "Scheme breach", "controls": "Claims rules engine", "evidence": "Claim setup records", "owner": "Claims", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201103", "ref": "s 3.3", "statement": "Pay statutory benefits to injured persons regardless of fault", "trigger": "Injury caused by motor accident", "risk": "Unlawful denial", "controls": "Claims payment rules", "evidence": "Payment history", "owner": "Claims", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201104", "ref": "s 3.4", "statement": "Benefits now cease after 52 weeks (was 26) where injured person is mostly at fault", "trigger": "Liability determination", "risk": "Overpayment", "controls": "Fault determination controls", "evidence": "Liability decision", "owner": "Claims", "part": "P3", "status": "amended", "effective": "1 Apr 2023"}, {"id": "P3\u201105", "ref": "s 3.5", "statement": "Benefits limited after 52 weeks (was 26) to persons with threshold injury", "trigger": "Post\u201126 week period", "risk": "Scheme cost escalation", "controls": "Injury classification", "evidence": "Injury assessment reports", "owner": "Claims", "part": "P3", "status": "amended", "effective": "1 Apr 2023"}, {"id": "P3\u201106", "ref": "s 3.6", "statement": "Pay weekly statutory benefits for loss of earnings as prescribed", "trigger": "Loss of income", "risk": "Underpayment", "controls": "Income calculation model", "evidence": "Earnings calculations", "owner": "Claims", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201107", "ref": "s 3.7", "statement": "Apply correct percentage of pre\u2011accident earnings", "trigger": "Weekly benefit calc", "risk": "Miscalculation", "controls": "Automated calculators", "evidence": "Payment schedules", "owner": "Claims", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201108", "ref": "s 3.8", "statement": "Adjust weekly payments after second entitlement period", "trigger": "Time\u2011based change", "risk": "Over/under payment", "controls": "Time\u2011triggered controls", "evidence": "Adjustment logs", "owner": "Claims", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201109", "ref": "s 3.9", "statement": "Reduce or cease weekly payments when work capacity restored", "trigger": "Capacity assessment", "risk": "Overpayment", "controls": "Capacity reviews", "evidence": "Medical assessments", "owner": "Claims", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201110", "ref": "s 3.24", "statement": "Pay reasonable and necessary treatment and care expenses", "trigger": "Treatment incurred", "risk": "Improper denial", "controls": "Treatment approval process", "evidence": "Treatment invoices", "owner": "Claims", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201111", "ref": "s 3.25", "statement": "Assess treatment in accordance with Motor Accident Guidelines", "trigger": "Treatment request", "risk": "Regulatory breach", "controls": "Guideline checklists", "evidence": "Approval notes", "owner": "Claims", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201112", "ref": "s 3.26", "statement": "Limit treatment payments where statutory time limits apply", "trigger": "Post\u201126 or 52 weeks", "risk": "Overpayment", "controls": "Duration tracking", "evidence": "Benefit duration logs", "owner": "Claims", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201113", "ref": "s 3.40", "statement": "Pay funeral expenses where death results from motor accident", "trigger": "Death claim", "risk": "Breach of Act", "controls": "Death benefit workflow", "evidence": "Funeral invoices", "owner": "Claims", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201114", "ref": "s 3.41", "statement": "Pay statutory death benefits to dependants", "trigger": "Eligible dependant", "risk": "Underpayment", "controls": "Dependency assessment", "evidence": "Dependency records", "owner": "Claims", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201115", "ref": "s 3.42", "statement": "Accept claims in approved form only", "trigger": "Claim lodgement", "risk": "Invalid rejection", "controls": "Claim intake controls", "evidence": "Claim forms", "owner": "Claims", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201116", "ref": "s 3.43", "statement": "Second liability decision deadline extended from 3 months to 9 months", "trigger": "Claim receipt", "risk": "Deemed acceptance", "controls": "SLA tracking", "evidence": "Decision timestamps", "owner": "Claims", "part": "P3", "status": "amended", "effective": "1 Apr 2023"}, {"id": "P3\u201117", "ref": "s 3.44", "statement": "Commence payments within required time after claim", "trigger": "Claim acceptance", "risk": "Interest penalties", "controls": "Payment SLAs", "evidence": "Payment dates", "owner": "Claims", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201118", "ref": "s 3.45", "statement": "Provide written reasons for adverse decisions", "trigger": "Benefit reduction/denial", "risk": "Procedural breach", "controls": "Decision templates", "evidence": "Decision letters", "owner": "Claims", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201119", "ref": "s 3.46", "statement": "Conduct internal reviews within statutory timeframes", "trigger": "Review request", "risk": "Deemed decision", "controls": "Review SLA monitoring", "evidence": "Review outcomes", "owner": "Claims", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201120", "ref": "s 3.47", "statement": "Notify claimant of review rights and dispute options", "trigger": "Adverse decision", "risk": "Regulatory breach", "controls": "Standard notices", "evidence": "Review letters", "owner": "Claims", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201121", "ref": "s 3.48", "statement": "Recover overpayments only as permitted by the Act", "trigger": "Overpayment identified", "risk": "Unlawful recovery", "controls": "Recovery governance", "evidence": "Recovery calculations", "owner": "Finance", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201122", "ref": "s 3.49", "statement": "Not contract out of statutory benefits obligations", "trigger": "Any agreement", "risk": "Void arrangements", "controls": "Legal review", "evidence": "Contract reviews", "owner": "Legal", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P3\u201123", "ref": "s 3.50", "statement": "Comply with directions issued by the Authority regarding benefits", "trigger": "Authority direction", "risk": "Licence action", "controls": "Regulatory monitoring", "evidence": "Direction responses", "owner": "Compliance", "part": "P3", "status": "original", "effective": "1 Dec 2017"}, {"id": "P4\u201101", "ref": "s 4.1", "statement": "Permit access to common law damages only in accordance with Part 4", "trigger": "Damages claim lodged", "risk": "Unlawful claim handling", "controls": "Damages eligibility framework", "evidence": "Eligibility assessments", "owner": "Claims", "part": "P4", "status": "original", "effective": "1 Dec 2017"}, {"id": "P4\u201102", "ref": "s 4.2", "statement": "Apply Part 4 restrictions in addition to Part 3 statutory benefits", "trigger": "Transition from benefits to damages", "risk": "Double compensation", "controls": "Claims workflow controls", "evidence": "Claim timelines", "owner": "Claims", "part": "P4", "status": "original", "effective": "1 Dec 2017"}, {"id": "P4\u201103", "ref": "s 4.3", "statement": "Terminology changed from \"minor injury\" to \"threshold injury\"", "trigger": "Damages assessment", "risk": "Unlawful payment", "controls": "Injury classification controls", "evidence": "Medical assessments", "owner": "Claims", "part": "P4", "status": "amended", "effective": "1 Apr 2023"}, {"id": "P4\u201104", "ref": "s 4.4", "statement": "Terminology changed from \"minor injury\" to \"threshold injury\"", "trigger": "Damages eligibility", "risk": "Improper denial", "controls": "Threshold determination process", "evidence": "Injury determination notices", "owner": "Claims", "part": "P4", "status": "amended", "effective": "1 Apr 2023"}, {"id": "P4\u201105", "ref": "s 4.5", "statement": "Internal review no longer required before WPI referral to PIC", "trigger": "Injury dispute", "risk": "Invalid determination", "controls": "Medical referral protocols", "evidence": "MAS certificates", "owner": "Claims", "part": "P4", "status": "amended", "effective": "28 Nov 2022"}, {"id": "P4\u201106", "ref": "s 4.6", "statement": "Allow common law damages only where injured person is not mostly at fault", "trigger": "Liability determination", "risk": "Scheme breach", "controls": "Fault assessment framework", "evidence": "Liability decisions", "owner": "Claims", "part": "P4", "status": "original", "effective": "1 Dec 2017"}, {"id": "P4\u201107", "ref": "s 4.7", "statement": "Reduce damages proportionately for contributory negligence", "trigger": "Liability apportionment", "risk": "Overpayment", "controls": "Apportionment methodology", "evidence": "Settlement calculations", "owner": "Claims", "part": "P4", "status": "original", "effective": "1 Dec 2017"}, {"id": "P4\u201108", "ref": "s 4.8", "statement": "Exclude damages for non\u2011economic loss", "trigger": "Damages calculation", "risk": "Illegal payment", "controls": "Damages calculation rules", "evidence": "Settlement breakdowns", "owner": "Claims", "part": "P4", "status": "original", "effective": "1 Dec 2017"}, {"id": "P4\u201109", "ref": "s 4.9", "statement": "Exclude exemplary, punitive, or aggravated damages", "trigger": "Damages claim", "risk": "Statutory breach", "controls": "Legal review", "evidence": "Settlement approvals", "owner": "Legal", "part": "P4", "status": "original", "effective": "1 Dec 2017"}, {"id": "P4\u201110", "ref": "s 4.10", "statement": "Economic loss limited to post-52 week losses (was post-26 week)", "trigger": "Damages period", "risk": "Double recovery", "controls": "Temporal damage controls", "evidence": "Loss schedules", "owner": "Claims", "part": "P4", "status": "amended", "effective": "1 Apr 2023"}, {"id": "P4\u201111", "ref": "s 4.11", "statement": "Deduct statutory benefits paid from damages awards", "trigger": "Settlement/judgment", "risk": "Double compensation", "controls": "Offset calculations", "evidence": "Settlement worksheets", "owner": "Claims", "part": "P4", "status": "original", "effective": "1 Dec 2017"}, {"id": "P4\u201112", "ref": "s 4.12", "statement": "Ensure no overlap between statutory benefits and damages", "trigger": "Claim lifecycle", "risk": "Scheme leakage", "controls": "Benefits\u2011damages reconciliation", "evidence": "Payment reconciliations", "owner": "Finance", "part": "P4", "status": "original", "effective": "1 Dec 2017"}, {"id": "P4\u201113", "ref": "s 4.13", "statement": "Require service of compliant claim for damages", "trigger": "Damages claim received", "risk": "Invalid claim acceptance", "controls": "Claim intake checks", "evidence": "Claim forms", "owner": "Claims", "part": "P4", "status": "original", "effective": "1 Dec 2017"}, {"id": "P4\u201114", "ref": "s 4.14", "statement": "Respond to damages claims within statutory timeframes", "trigger": "Claim service", "risk": "Deemed admissions", "controls": "SLA monitoring", "evidence": "Response records", "owner": "Claims", "part": "P4", "status": "original", "effective": "1 Dec 2017"}, {"id": "P4\u201115", "ref": "s 4.15", "statement": "Exchange relevant information and documents as required", "trigger": "Damages proceedings", "risk": "Procedural breach", "controls": "Disclosure protocols", "evidence": "Disclosure logs", "owner": "Legal", "part": "P4", "status": "original", "effective": "1 Dec 2017"}, {"id": "P4\u201116", "ref": "s 4.16", "statement": "Participate in mandatory dispute resolution before litigation", "trigger": "Pre\u2011court phase", "risk": "Costs sanctions", "controls": "DR workflows", "evidence": "DR outcomes", "owner": "Legal", "part": "P4", "status": "original", "effective": "1 Dec 2017"}, {"id": "P4\u201117", "ref": "s 4.17", "statement": "Not settle damages contrary to statutory restrictions", "trigger": "Settlement", "risk": "Regulatory breach", "controls": "Settlement approval matrix", "evidence": "Settlement deeds", "owner": "Claims", "part": "P4", "status": "original", "effective": "1 Dec 2017"}, {"id": "P4\u201118", "ref": "s 4.18", "statement": "Comply with court judgments for damages", "trigger": "Judgment", "risk": "Enforcement action", "controls": "Judgment payment process", "evidence": "Payment records", "owner": "Legal", "part": "P4", "status": "original", "effective": "1 Dec 2017"}, {"id": "P4\u201119", "ref": "s 4.19", "statement": "Apply statutory limits on legal costs recoverable", "trigger": "Costs assessment", "risk": "Overpayment", "controls": "Costs schedules", "evidence": "Cost assessments", "owner": "Legal", "part": "P4", "status": "original", "effective": "1 Dec 2017"}, {"id": "P4\u201120", "ref": "s 4.20", "statement": "Not contract out of Part 4 obligations", "trigger": "Agreements", "risk": "Void arrangements", "controls": "Contract review", "evidence": "Legal sign\u2011off", "owner": "Legal", "part": "P4", "status": "original", "effective": "1 Dec 2017"}, {"id": "P4\u201121", "ref": "s 4.21", "statement": "Comply with Authority directions relating to damages claims", "trigger": "Direction issued", "risk": "Licence risk", "controls": "Regulatory monitoring", "evidence": "Direction responses", "owner": "Compliance", "part": "P4", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201101", "ref": "s 5.1", "statement": "Handle disputes only through mechanisms permitted by Part 5", "trigger": "Any dispute arises", "risk": "Invalid process", "controls": "Dispute framework", "evidence": "Dispute intake records", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201102", "ref": "s 5.2", "statement": "Recognise dispute categories as defined by the Act", "trigger": "Dispute identification", "risk": "Incorrect forum", "controls": "Dispute classification rules", "evidence": "Dispute categorisation", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201103", "ref": "s 5.3", "statement": "Provide internal review of insurer decisions on request", "trigger": "Review request received", "risk": "Deemed adverse decision", "controls": "Review intake workflow", "evidence": "Review requests", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201104", "ref": "s 5.3", "statement": "Restrict internal review to reviewable decisions only", "trigger": "Review eligibility", "risk": "Invalid review", "controls": "Eligibility checks", "evidence": "Review scope assessment", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201105", "ref": "s 5.4", "statement": "Complete internal review within statutory timeframes", "trigger": "Review commenced", "risk": "Deemed affirmation", "controls": "SLA tracking", "evidence": "Review timestamps", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201106", "ref": "s 5.4", "statement": "Ensure reviewer was not involved in original decision", "trigger": "Review assignment", "risk": "Procedural breach", "controls": "Segregation of duties", "evidence": "Reviewer assignment logs", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201107", "ref": "s 5.4", "statement": "Consider all relevant information afresh", "trigger": "Review assessment", "risk": "Unreasonable decision", "controls": "Review checklists", "evidence": "Review reasoning", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201108", "ref": "s 5.5", "statement": "Provide written notice of internal review outcome", "trigger": "Review decision", "risk": "Procedural breach", "controls": "Decision templates", "evidence": "Review outcome letters", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201109", "ref": "s 5.5", "statement": "Include reasons and review rights in outcome notice", "trigger": "Adverse outcome", "risk": "Regulatory breach", "controls": "Mandatory content controls", "evidence": "Review letters", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201110", "ref": "s 5.6", "statement": "Participate in merit review conducted by the Authority", "trigger": "Merit review lodged", "risk": "Non\u2011cooperation", "controls": "Authority liaison process", "evidence": "Authority correspondence", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201111", "ref": "s 5.6", "statement": "Provide documents and information requested by the Authority", "trigger": "Information request", "risk": "Adverse inference", "controls": "Document management", "evidence": "Document submissions", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201112", "ref": "s 5.7", "statement": "Give effect to merit review determinations", "trigger": "Determination issued", "risk": "Enforcement action", "controls": "Determination tracking", "evidence": "Implementation records", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201113", "ref": "s 5.7", "statement": "Adjust benefits or decisions in accordance with determination", "trigger": "Determination outcome", "risk": "Continued non\u2011compliance", "controls": "Benefit recalculation", "evidence": "Updated payments", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201114", "ref": "s 5.8", "statement": "Refer medical disputes only to approved medical assessors", "trigger": "Medical dispute", "risk": "Invalid determination", "controls": "MAS referral protocols", "evidence": "Referral records", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201115", "ref": "s 5.8", "statement": "Comply with procedural requirements for medical referrals", "trigger": "Referral submission", "risk": "Procedural invalidity", "controls": "Referral checklists", "evidence": "MAS applications", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201116", "ref": "s 5.9", "statement": "Be bound by medical assessor determinations", "trigger": "Certificate issued", "risk": "Improper decision", "controls": "Determination register", "evidence": "MAS certificates", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201117", "ref": "s 5.9", "statement": "Apply medical determinations to benefits and damages decisions", "trigger": "Determination", "risk": "Incorrect entitlements", "controls": "Claims update process", "evidence": "Updated decisions", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201118", "ref": "s 5.10", "statement": "Participate in review of medical assessments where permitted", "trigger": "Review sought", "risk": "Procedural breach", "controls": "Review eligibility checks", "evidence": "Review applications", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201119", "ref": "s 5.10", "statement": "Give effect to review panel determinations", "trigger": "Review outcome", "risk": "Enforcement action", "controls": "Determination tracking", "evidence": "Implementation records", "owner": "Claims", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201120", "ref": "s 5.11", "statement": "Pay costs only as permitted by dispute resolution provisions", "trigger": "Cost claim", "risk": "Overpayment", "controls": "Costs assessment rules", "evidence": "Cost determinations", "owner": "Legal", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201121", "ref": "s 5.12", "statement": "Comply with procedural rules made for dispute resolution", "trigger": "Rule amendment", "risk": "Procedural breach", "controls": "Regulatory watch", "evidence": "Procedure updates", "owner": "Compliance", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P5\u201122", "ref": "s 5.13", "statement": "Comply with directions issued by the Authority relating to disputes", "trigger": "Direction issued", "risk": "Licence action", "controls": "Direction management", "evidence": "Direction responses", "owner": "Compliance", "part": "P5", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201101", "ref": "s 6.1", "statement": "Comply with regulatory oversight exercised by the Authority in administering the scheme", "trigger": "Ongoing licence holding", "risk": "Licence action", "controls": "Regulatory engagement framework", "evidence": "Correspondence with Authority", "owner": "Compliance", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201102", "ref": "s 6.2", "statement": "Exercise insurer functions consistently with the objects of the Act", "trigger": "All insurer activities", "risk": "Systemic breach", "controls": "Policy governance", "evidence": "Governance attestations", "owner": "Compliance", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201103", "ref": "s 6.3", "statement": "Provide information required by the Authority within specified timeframes", "trigger": "Information notice issued", "risk": "Enforcement action", "controls": "Regulatory request tracking", "evidence": "Submitted responses", "owner": "Compliance", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201104", "ref": "s 6.3", "statement": "Ensure information provided is accurate, complete and not misleading", "trigger": "Any regulatory submission", "risk": "Civil penalty", "controls": "Quality assurance review", "evidence": "Data validation checks", "owner": "Compliance", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201105", "ref": "s 6.4", "statement": "Produce documents or records when required by the Authority", "trigger": "Document notice", "risk": "Compulsory powers exercised", "controls": "Records management", "evidence": "Document production logs", "owner": "Operations", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201106", "ref": "s 6.5", "statement": "Provide statutory returns, reports and data as required", "trigger": "Reporting cycle", "risk": "Licence breach", "controls": "Reporting calendar", "evidence": "Submitted returns", "owner": "Finance", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201107", "ref": "s 6.5", "statement": "Use approved form and manner for all regulatory reporting", "trigger": "Report submission", "risk": "Rejection or enforcement", "controls": "Reporting standards", "evidence": "Approved templates", "owner": "Compliance", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201108", "ref": "s 6.6", "statement": "Cooperate with audits or investigations conducted by the Authority", "trigger": "Audit commenced", "risk": "Adverse findings", "controls": "Audit response protocol", "evidence": "Audit working papers", "owner": "Compliance", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201109", "ref": "s 6.6", "statement": "Provide reasonable assistance to authorised officers", "trigger": "Officer request", "risk": "Obstruction offence", "controls": "Staff training", "evidence": "Interaction records", "owner": "Compliance", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201110", "ref": "s 6.7", "statement": "Permit inspection of insurer premises, systems and records", "trigger": "Inspection notice", "risk": "Enforcement escalation", "controls": "Access management", "evidence": "Inspection logs", "owner": "Operations", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201111", "ref": "s 6.8", "statement": "Comply with written directions issued by the Authority", "trigger": "Direction issued", "risk": "Licence suspension", "controls": "Direction management process", "evidence": "Direction register", "owner": "Compliance", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201112", "ref": "s 6.8", "statement": "Implement corrective actions within required timeframes", "trigger": "Direction conditions", "risk": "Escalated enforcement", "controls": "Remediation tracking", "evidence": "Action plans", "owner": "Compliance", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201113", "ref": "s 6.9", "statement": "Not engage in conduct that contravenes licence conditions", "trigger": "All operations", "risk": "Licence cancellation", "controls": "Licence condition monitoring", "evidence": "Compliance attestations", "owner": "Compliance", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201114", "ref": "s 6.10", "statement": "Comply with enforceable undertakings if entered", "trigger": "Undertaking accepted", "risk": "Court enforcement", "controls": "Undertaking governance", "evidence": "Progress reports", "owner": "Compliance", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201115", "ref": "s 6.11", "statement": "Not provide false or misleading information to the Authority", "trigger": "Any submission", "risk": "Civil penalty", "controls": "Submission sign\u2011off", "evidence": "Legal certifications", "owner": "Legal", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201116", "ref": "s 6.12", "statement": "Not obstruct or hinder authorised officers", "trigger": "Investigation activity", "risk": "Criminal offence", "controls": "Staff conduct policy", "evidence": "Training records", "owner": "Compliance", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201117", "ref": "s 6.13", "statement": "Use protected information only for permitted purposes", "trigger": "Access to regulatory data", "risk": "Unauthorised disclosure", "controls": "Information access controls", "evidence": "Access logs", "owner": "Privacy", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201118", "ref": "s 6.13", "statement": "Maintain confidentiality of protected information", "trigger": "Ongoing", "risk": "Civil liability", "controls": "Data protection controls", "evidence": "Security attestations", "owner": "Privacy", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201119", "ref": "s 6.14", "statement": "Recognise and comply with actions of delegated Authority officers", "trigger": "Delegated action", "risk": "Invalid challenge", "controls": "Delegation awareness", "evidence": "Delegation notices", "owner": "Compliance", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P6\u201120", "ref": "s 6.15", "statement": "Comply with regulations made under Part 6", "trigger": "Regulation change", "risk": "Regulatory breach", "controls": "Regulatory watch", "evidence": "Change impact assessments", "owner": "Compliance", "part": "P6", "status": "original", "effective": "1 Dec 2017"}, {"id": "P7\u201101", "ref": "s 7.1", "statement": "Apply the Act despite any inconsistent agreements or arrangements", "trigger": "Any policy, settlement or contract", "risk": "Void or unenforceable arrangements", "controls": "Legal review of agreements", "evidence": "Contract approvals", "owner": "Legal", "part": "P7", "status": "original", "effective": "1 Dec 2017"}, {"id": "P7\u201102", "ref": "s 7.1", "statement": "Not rely on other laws to avoid obligations imposed by this Act", "trigger": "Claims handling or settlement", "risk": "Scheme breach", "controls": "Legal interpretation framework", "evidence": "Legal advice", "owner": "Legal", "part": "P7", "status": "original", "effective": "1 Dec 2017"}, {"id": "P7\u201103", "ref": "s 7.2", "statement": "Recognise and comply with actions taken under valid delegations", "trigger": "Delegated decision or action", "risk": "Invalid challenge", "controls": "Delegation register awareness", "evidence": "Delegation instruments", "owner": "Compliance", "part": "P7", "status": "original", "effective": "1 Dec 2017"}, {"id": "P7\u201104", "ref": "s 7.2", "statement": "Treat delegated acts as acts of the Authority for compliance purposes", "trigger": "Authority interaction", "risk": "Procedural breach", "controls": "Authority liaison protocols", "evidence": "Correspondence", "owner": "Compliance", "part": "P7", "status": "original", "effective": "1 Dec 2017"}, {"id": "P7\u201105", "ref": "s 7.3", "statement": "Comply with regulations made under the Act", "trigger": "Regulation in force", "risk": "Regulatory breach", "controls": "Regulatory watch process", "evidence": "Change impact assessments", "owner": "Compliance", "part": "P7", "status": "original", "effective": "1 Dec 2017"}, {"id": "P7\u201106", "ref": "s 7.3", "statement": "Update policies, systems and procedures following regulatory changes", "trigger": "Regulation amendment", "risk": "Systemic non\u2011compliance", "controls": "Change management framework", "evidence": "Updated procedures", "owner": "Compliance", "part": "P7", "status": "original", "effective": "1 Dec 2017"}, {"id": "P7\u201107", "ref": "Sch 1 (Pt 7)", "statement": "Apply correct legislative regime to pre\u2011commencement accidents", "trigger": "Accident date before commencement", "risk": "Incorrect benefit application", "controls": "Claim vintage classification", "evidence": "Claim setup data", "owner": "Claims", "part": "P7", "status": "original", "effective": "1 Dec 2017"}, {"id": "P7\u201108", "ref": "Sch 1 (Pt 7)", "statement": "Continue handling transitional claims in accordance with savings provisions", "trigger": "Transitional claim", "risk": "Unlawful benefits", "controls": "Transitional claim rules", "evidence": "Transitional claim files", "owner": "Claims", "part": "P7", "status": "original", "effective": "1 Dec 2017"}, {"id": "P7\u201109", "ref": "Sch 1 (Pt 7)", "statement": "Preserve accrued rights and liabilities under former Acts", "trigger": "Transitional period", "risk": "Legal challenge", "controls": "Legal interpretation controls", "evidence": "Legal opinions", "owner": "Legal", "part": "P7", "status": "original", "effective": "1 Dec 2017"}, {"id": "P7\u201110", "ref": "Sch 1 (Pt 7)", "statement": "Ensure no retrospective removal of entitlements", "trigger": "Transitional assessment", "risk": "Judicial review risk", "controls": "Entitlement validation", "evidence": "Benefit determinations", "owner": "Claims", "part": "P7", "status": "original", "effective": "1 Dec 2017"}, {"id": "P7\u201111", "ref": "Sch 1 (Pt 7)", "statement": "Comply with transitional directions issued by the Authority", "trigger": "Transitional direction", "risk": "Licence action", "controls": "Direction management", "evidence": "Direction register", "owner": "Compliance", "part": "P7", "status": "original", "effective": "1 Dec 2017"}, {"id": "P7\u201112", "ref": "Sch 1 (Pt 7)", "statement": "Continue enforcement actions commenced under prior legislation where required", "trigger": "Legacy enforcement", "risk": "Procedural defect", "controls": "Enforcement tracking", "evidence": "Enforcement records", "owner": "Legal", "part": "P7", "status": "original", "effective": "1 Dec 2017"}, {"id": "NEW\u201101", "ref": "MAG v10 cl 4.129A", "statement": "Where insurer holds medical report indicating WPI exceeding 10%, promptly request further information needed and advise claimant what is being sought and why (Atwal duty)", "trigger": "WPI report >10%", "risk": "Adverse court finding; regulatory action", "controls": "WPI assessment tracking", "evidence": "Info requests; notifications", "owner": "Claims", "part": "NEW", "status": "new", "effective": "15 Sep 2025"}, {"id": "NEW\u201102", "ref": "MAG v10 cl 4.9A", "statement": "Warn that material may be distressing and provide opportunity for nominated person to receive communications", "trigger": "Distressing material", "risk": "Claimant harm; SIRA action", "controls": "Content screening", "evidence": "Warning notices", "owner": "Claims", "part": "NEW", "status": "new", "effective": "15 Sep 2025"}, {"id": "NEW\u201103", "ref": "MAG v10 cl 4.34-4.35", "statement": "Provide enhanced clarity in liability decision notices including specific reasons and evidence relied upon", "trigger": "Liability decision", "risk": "Decision overturned", "controls": "Decision notice templates", "evidence": "Decision notices; QA logs", "owner": "Claims", "part": "NEW", "status": "new", "effective": "15 Sep 2025"}, {"id": "NEW\u201104", "ref": "MAG v10 cl 4.45", "statement": "Provide mandatory written notice explaining the calculation of pre-accident weekly earnings", "trigger": "Weekly benefits commenced", "risk": "Disputes; SIRA finding", "controls": "Earnings calculation templates", "evidence": "Written explanations", "owner": "Claims", "part": "NEW", "status": "new", "effective": "15 Sep 2025"}, {"id": "NEW\u201105", "ref": "MAG v10 cl 4.61-4.63", "statement": "Complete specified procedural prerequisites before suspending weekly benefits", "trigger": "Suspension considered", "risk": "Unlawful suspension; penalty", "controls": "Suspension checklist", "evidence": "Pre-suspension records", "owner": "Claims", "part": "NEW", "status": "new", "effective": "15 Sep 2025"}, {"id": "NEW\u201106", "ref": "MAG v10 Part 3", "statement": "Demonstrate alignment of business plans with updated Customer Service Conduct Principles", "trigger": "Business plan submission", "risk": "Licence condition breach", "controls": "CSCP self-assessment", "evidence": "Business plans; culture reports", "owner": "Compliance", "part": "NEW", "status": "new", "effective": "15 Sep 2025"}, {"id": "NEW\u201107", "ref": "SIRA Reg Framework", "statement": "Promptly notify SIRA of significant matters relating to policies, claims, or scheme operations", "trigger": "Significant matter identified", "risk": "Regulatory action", "controls": "Escalation procedure", "evidence": "Notification records", "owner": "Compliance", "part": "NEW", "status": "new", "effective": "1 Mar 2024"}, {"id": "NEW\u201108", "ref": "s 7.17 (amended)", "statement": "Apply updated definition of medical dispute extending to disputes determined through merit review", "trigger": "Dispute categorisation", "risk": "Incorrect routing", "controls": "Classification rules update", "evidence": "Categorisation records", "owner": "Claims / Legal", "part": "NEW", "status": "new", "effective": "18 Feb 2026"}, {"id": "PEND\u201101", "ref": "Micromobility Act Sch 2", "statement": "Exclude injuries from micromobility vehicle use from CTP scope once proclaimed", "trigger": "Micromobility accident", "risk": "Incorrect claim acceptance", "controls": "Vehicle classification update", "evidence": "Claim records", "owner": "UW / Claims", "part": "PEND", "status": "pending", "effective": "TBC"}, {"id": "PEND\u201102", "ref": "Claim Farming Bill", "statement": "Do not engage in or benefit from claim farming practices \u2014 penalties up to $55,000", "trigger": "Claim referral", "risk": "Criminal offence; $55K penalty", "controls": "Referral source audit", "evidence": "Referral records", "owner": "Compliance", "part": "PEND", "status": "pending", "effective": "TBC"}], "level1": [{"id": "CTP\u201101", "category": "Licensing & Authorisation", "ref": "ss 9.1\u20139.5, 10.1", "obligation": "Insurer must hold a valid licence issued by the Authority and comply with all licence conditions", "risk": "Loss of licence, enforcement action, inability to issue policies", "controls": "Licence management framework; regulatory attestations; board oversight", "owner": "Regulatory Compliance", "evidence": "Current licence; licence conditions register; board papers", "monitoring": "Annual licence review; regulatory engagement"}, {"id": "CTP\u201102", "category": "Policy Issuance", "ref": "ss 2.3\u20132.7", "obligation": "Insurer must issue CTP policies in the statutory form and issue certificates of insurance upon premium acceptance", "risk": "Invalid cover; uninsured vehicles; regulatory breach", "controls": "System\u2011controlled policy wording; automated certificate issuance", "owner": "Underwriting", "evidence": "Policy templates; certificates; system logs", "monitoring": "Ongoing; QA sampling"}, {"id": "CTP\u201103", "category": "Policy Period Management", "ref": "s 2.7", "obligation": "Policies must commence and remain on risk strictly in accordance with registration and grace period rules", "risk": "Uninsured exposure; scheme integrity risk", "controls": "Integration with TfNSW data; automated start/end dates", "owner": "Underwriting / IT", "evidence": "Policy system rules; TfNSW interface logs", "monitoring": "Continuous monitoring"}, {"id": "CTP\u201104", "category": "Premium Filing", "ref": "ss 2.20\u20132.21", "obligation": "Premiums must be filed with the Authority before being charged", "risk": "Civil penalties; premium rejection", "controls": "Actuarial governance process; regulatory filing checklist", "owner": "Actuarial", "evidence": "Filed premium submissions; Authority acknowledgements", "monitoring": "Per filing cycle"}, {"id": "CTP\u201105", "category": "Premium Adequacy", "ref": "s 2.22", "obligation": "Premiums must not be excessive or inadequate and must comply with Guidelines", "risk": "Regulatory intervention; forced repricing", "controls": "Actuarial peer review; Authority engagement", "owner": "Actuarial", "evidence": "Actuarial reports; rejection notices", "monitoring": "Each premium review"}, {"id": "CTP\u201106", "category": "Profit Disclosure", "ref": "s 2.23", "obligation": "Insurer must disclose profit margin and actuarial basis to the Authority", "risk": "Reputational damage; regulatory action", "controls": "Profit margin disclosure controls", "owner": "Finance / Actuarial", "evidence": "Profit disclosures; annual report extracts", "monitoring": "Annual"}, {"id": "CTP\u201107", "category": "Claims Handling \u2013 Good Faith", "ref": "ss 6.1\u20136.7", "obligation": "Claims must be handled honestly, efficiently, and in good faith", "risk": "Civil penalties; adverse findings", "controls": "Claims conduct framework; training", "owner": "Claims", "evidence": "Claims manuals; training records", "monitoring": "Ongoing QA"}, {"id": "CTP\u201108", "category": "Liability Decisions", "ref": "ss 6.19\u20136.24", "obligation": "Liability decisions must be made within statutory timeframes", "risk": "Deemed acceptance; increased claim cost", "controls": "SLA tracking; automated reminders", "owner": "Claims", "evidence": "Decision notices; system timestamps", "monitoring": "Monthly"}, {"id": "CTP\u201109", "category": "Statutory Benefits \u2013 Payment", "ref": "Part 3", "obligation": "Statutory benefits must be paid accurately and on time", "risk": "Financial penalties; claimant harm", "controls": "Benefits payment controls; dual authorisation", "owner": "Claims", "evidence": "Payment records; benefit calculations", "monitoring": "Ongoing"}, {"id": "CTP\u201110", "category": "Statutory Benefits \u2013 Integrity", "ref": "ss 3.26\u20133.28", "obligation": "Insurer must verify expenses and prevent duplicate benefits", "risk": "Scheme leakage; fraud risk", "controls": "Expense verification rules; audits", "owner": "Claims / Finance", "evidence": "Audit reports; recovery actions", "monitoring": "Quarterly"}, {"id": "CTP\u201111", "category": "Dispute Resolution", "ref": "Part 7", "obligation": "Insurer must participate in internal review, merit review, and medical assessments", "risk": "Adverse determinations; sanctions", "controls": "Dispute management framework", "owner": "Claims / Legal", "evidence": "Review outcomes; Commission correspondence", "monitoring": "Ongoing"}, {"id": "CTP\u201112", "category": "Compliance with Decisions", "ref": "ss 7.42\u20137.47", "obligation": "Insurer must comply with Commission determinations", "risk": "Enforcement action; penalties", "controls": "Decision tracking and implementation", "owner": "Claims / Legal", "evidence": "Determination registers; payment evidence", "monitoring": "Monthly"}, {"id": "CTP\u201113", "category": "Fraud Prevention", "ref": "ss 6.39\u20136.42", "obligation": "Insurer must take reasonable steps to prevent and report fraud", "risk": "Regulatory action; financial loss", "controls": "Fraud strategy; referral protocols", "owner": "Claims / Risk", "evidence": "Fraud referrals; investigation logs", "monitoring": "Ongoing"}, {"id": "CTP\u201114", "category": "Data & Reporting", "ref": "ss 9.21\u20139.24", "obligation": "Insurer must submit accurate data and reports to the Authority", "risk": "Civil penalties; regulatory action", "controls": "Data governance framework", "owner": "Data / Compliance", "evidence": "Data submissions; validation reports", "monitoring": "Scheduled reporting"}, {"id": "CTP\u201115", "category": "Audit & Inspection", "ref": "ss 10.23\u201310.25", "obligation": "Insurer must cooperate with audits and inspections", "risk": "Licence conditions breached", "controls": "Audit response procedures", "owner": "Compliance", "evidence": "Audit responses; remediation plans", "monitoring": "As required"}, {"id": "CTP\u201116", "category": "Guideline Compliance", "ref": "ss 10.2\u201310.8", "obligation": "Insurer must comply with all Motor Accident Guidelines", "risk": "Regulatory sanctions", "controls": "Guideline mapping register", "owner": "Compliance", "evidence": "Guideline compliance matrix", "monitoring": "Ongoing"}, {"id": "CTP\u201117", "category": "Fund Levies", "ref": "ss 10.12\u201310.18", "obligation": "Insurer must collect and remit statutory levies", "risk": "Financial penalties", "controls": "Levy calculation controls", "owner": "Finance", "evidence": "Levy payment records", "monitoring": "Monthly"}, {"id": "CTP\u201118", "category": "Nominal Defendant Claims", "ref": "ss 2.27\u20132.37", "obligation": "Insurer must act as agent for Nominal Defendant where applicable", "risk": "Scheme failure; reputational risk", "controls": "ND claims procedures", "owner": "Claims", "evidence": "ND claim files", "monitoring": "Ongoing"}, {"id": "CTP\u201119", "category": "Confidentiality & Privacy", "ref": "s 11.2", "obligation": "Protected information must be kept confidential", "risk": "Privacy breaches; penalties", "controls": "Information security controls", "owner": "IT / Compliance", "evidence": "Access logs; privacy training", "monitoring": "Annual"}, {"id": "CTP\u201120", "category": "Advertising & Conduct", "ref": "s 11.11", "obligation": "Advertising must comply with statutory restrictions", "risk": "Enforcement action", "controls": "Marketing compliance review", "owner": "Marketing / Legal", "evidence": "Approved materials", "monitoring": "Campaign\u2011based"}]};
+const D=[{"id": "ACT-001", "source": "Act", "ref": "s 1.3(3)(d)", "actPart": "Part 1 \u2014 Preliminary", "division": "Div 1.1 \u2014 Introductory", "statement": "Account for profit margins as recipient of compulsorily levied public money; make records available to Authority", "valueChain": "Regulatory / Compliance", "function": "Governance", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 1.58\u20131.60", "notes": "Interpretive principle"}, {"id": "ACT-002", "source": "Act", "ref": "s 1.6", "actPart": "Part 1 \u2014 Preliminary", "division": "Div 1.2 \u2014 Interpretation", "statement": "Apply 'threshold injury' definition (replaces 'minor injury')", "valueChain": "Claims \u2014 Liability & Damages", "function": "Injury Classification", "type": "Must", "status": "Amended Apr 2023", "effective": "1 Apr 2023", "magRef": "MAG 5.1\u20135.16", "notes": "Terminology change"}, {"id": "ACT-003", "source": "Act", "ref": "s 2.3", "actPart": "Part 2 \u2014 Insurance", "division": "Div 2.2 \u2014 Insurance Policies", "statement": "Insure owner and any driver against liability for death or injury caused by fault", "valueChain": "Underwriting / Product", "function": "Coverage", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 2.11\u20132.12", "notes": "Core coverage obligation"}, {"id": "ACT-004", "source": "Act", "ref": "s 2.5", "actPart": "Part 2 \u2014 Insurance", "division": "Div 2.2 \u2014 Insurance Policies", "statement": "Issue certificate of insurance upon premium payment", "valueChain": "Distribution / Policy Issuance", "function": "Certificate", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 2.25", "notes": ""}, {"id": "ACT-005", "source": "Act", "ref": "s 2.8", "actPart": "Part 2 \u2014 Insurance", "division": "Div 2.2 \u2014 Insurance Policies", "statement": "Must not cancel a third-party policy (only Authority/TfNSW may cancel)", "valueChain": "Distribution / Policy Issuance", "function": "Cancellation", "type": "Must Not", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": "Prohibition on insurer"}, {"id": "ACT-006", "source": "Act", "ref": "s 2.11", "actPart": "Part 2 \u2014 Insurance", "division": "Div 2.2 \u2014 Insurance Policies", "statement": "Indemnify insured persons in accordance with the policy", "valueChain": "Underwriting / Product", "function": "Indemnity", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": "Core indemnity duty"}, {"id": "ACT-007", "source": "Act", "ref": "s 2.12", "actPart": "Part 2 \u2014 Insurance", "division": "Div 2.2 \u2014 Insurance Policies", "statement": "Remain liable even where correct premium was not paid", "valueChain": "Underwriting / Product", "function": "Liability", "type": "Liable", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": "Cannot void for premium error"}, {"id": "ACT-008", "source": "Act", "ref": "s 2.18", "actPart": "Part 2 \u2014 Insurance", "division": "Div 2.2 \u2014 Insurance Policies", "statement": "Subject to entry of judgment directly against the licensed insurer", "valueChain": "Legal / General", "function": "Judgment", "type": "Liable", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": "Direct action provision"}, {"id": "ACT-009", "source": "Act", "ref": "s 2.20", "actPart": "Part 2 \u2014 Insurance", "division": "Div 2.3 \u2014 Insurance Premiums", "statement": "Charge premiums only in accordance with Division 2.3", "valueChain": "Pricing / Actuarial", "function": "Premium Charging", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 1.6, 2.19", "notes": ""}, {"id": "ACT-010", "source": "Act", "ref": "s 2.21", "actPart": "Part 2 \u2014 Insurance", "division": "Div 2.3 \u2014 Insurance Premiums", "statement": "File proposed premiums with Authority; pay filing fees; compliance is a licence condition", "valueChain": "Pricing / Actuarial", "function": "Premium Filing", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 1.9\u20131.13", "notes": "Licence condition"}, {"id": "ACT-011", "source": "Act", "ref": "s 2.23", "actPart": "Part 2 \u2014 Insurance", "division": "Div 2.3 \u2014 Insurance Premiums", "statement": "Disclose profit margins and actuarial basis to Authority", "valueChain": "Pricing / Actuarial", "function": "Disclosure", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 1.58\u20131.60", "notes": ""}, {"id": "ACT-012", "source": "Act", "ref": "s 2.24", "actPart": "Part 2 \u2014 Insurance", "division": "Div 2.3 \u2014 Insurance Premiums", "statement": "Make third-party policies available to all customers (risk equalisation)", "valueChain": "Distribution / Policy Issuance", "function": "Access", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 2.12", "notes": ""}, {"id": "ACT-013", "source": "Act", "ref": "s 2.25", "actPart": "Part 2 \u2014 Insurance", "division": "Div 2.3 \u2014 Insurance Premiums", "statement": "Comply with excess-profit adjustment (TEPL) requirements; compliance is a licence condition", "valueChain": "Finance / Levies", "function": "TEPL", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": "Licence condition"}, {"id": "ACT-014", "source": "Act", "ref": "s 2.36", "actPart": "Part 2 \u2014 Insurance", "division": "Div 2.4 \u2014 Uninsured/Unidentified Vehicles", "statement": "Deal with Nominal Defendant claims allocated under Insurance Industry Deed", "valueChain": "Claims \u2014 Liability & Damages", "function": "Nominal Defendant", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 4.136\u20134.141", "notes": ""}, {"id": "ACT-015", "source": "Act", "ref": "s 3.2", "actPart": "Part 3 \u2014 Statutory Benefits", "division": "Div 3.1 \u2014 Entitlement to Statutory Benefits", "statement": "Relevant insurer is liable to pay statutory benefits; deemed liability under s 3.2(5)", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Benefit Payment", "type": "Liable", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 4.44", "notes": "Core benefits obligation"}, {"id": "ACT-016", "source": "Act", "ref": "s 3.4", "actPart": "Part 3 \u2014 Statutory Benefits", "division": "Div 3.2 \u2014 Funeral Expenses", "statement": "Pay funeral expenses where death results from motor accident", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Funeral", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-017", "source": "Act", "ref": "s 3.6", "actPart": "Part 3 \u2014 Statutory Benefits", "division": "Div 3.3 \u2014 Weekly Payments", "statement": "Pay weekly benefits \u2014 first entitlement period (weeks 1\u201313, 95% of PAE)", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Weekly Payments", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 4.44\u20134.45", "notes": ""}, {"id": "ACT-018", "source": "Act", "ref": "s 3.7", "actPart": "Part 3 \u2014 Statutory Benefits", "division": "Div 3.3 \u2014 Weekly Payments", "statement": "Pay weekly benefits \u2014 second entitlement period (weeks 14\u201378, 80\u201385% of PAE)", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Weekly Payments", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 4.45", "notes": "Late claims may backdate"}, {"id": "ACT-019", "source": "Act", "ref": "s 3.8", "actPart": "Part 3 \u2014 Statutory Benefits", "division": "Div 3.3 \u2014 Weekly Payments", "statement": "Pay weekly benefits after second entitlement period", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Weekly Payments", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-020", "source": "Act", "ref": "s 3.11", "actPart": "Part 3 \u2014 Statutory Benefits", "division": "Div 3.3 \u2014 Weekly Payments", "statement": "Cease benefits for threshold injury at 52 weeks (was 26 weeks)", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Benefit Duration", "type": "Must", "status": "Amended Apr 2023", "effective": "1 Apr 2023", "magRef": "MAG 4.62\u20134.66", "notes": "Key amendment"}, {"id": "ACT-021", "source": "Act", "ref": "s 3.19", "actPart": "Part 3 \u2014 Statutory Benefits", "division": "Div 3.3 \u2014 Weekly Payments", "statement": "Give notice before discontinuing or reducing weekly payments", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Notice", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 4.64\u20134.66", "notes": ""}, {"id": "ACT-022", "source": "Act", "ref": "s 3.22", "actPart": "Part 3 \u2014 Statutory Benefits", "division": "Div 3.3 \u2014 Weekly Payments", "statement": "Index weekly payment amounts per statutory indexation", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Indexation", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": "Annual indexation order"}, {"id": "ACT-023", "source": "Act", "ref": "s 3.23", "actPart": "Part 3 \u2014 Statutory Benefits", "division": "Div 3.3 \u2014 Weekly Payments", "statement": "Pay statutory benefits at least fortnightly", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Payment Frequency", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-024", "source": "Act", "ref": "s 3.24", "actPart": "Part 3 \u2014 Statutory Benefits", "division": "Div 3.4 \u2014 Treatment and Care", "statement": "Pay reasonable and necessary cost of treatment and care", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Treatment", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 4.80\u20134.107", "notes": "Core treatment obligation"}, {"id": "ACT-025", "source": "Act", "ref": "s 3.26", "actPart": "Part 3 \u2014 Statutory Benefits", "division": "Div 3.4 \u2014 Treatment and Care", "statement": "Pay for loss of capacity to provide gratuitous domestic services", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Domestic Services", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-026", "source": "Act", "ref": "s 3.28", "actPart": "Part 3 \u2014 Statutory Benefits", "division": "Div 3.4 \u2014 Treatment and Care", "statement": "Cease benefits for at-fault claimant at 52 weeks (was 26 weeks)", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Benefit Duration", "type": "Must", "status": "Amended Apr 2023", "effective": "1 Apr 2023", "magRef": "", "notes": "Key amendment"}, {"id": "ACT-027", "source": "Act", "ref": "s 3.30", "actPart": "Part 3 \u2014 Statutory Benefits", "division": "Div 3.4 \u2014 Treatment and Care", "statement": "Pay hospital, ambulance, and medical expenses not bulk-billed", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Medical Expenses", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-028", "source": "Act", "ref": "s 3.38", "actPart": "Part 3 \u2014 Statutory Benefits", "division": "Div 3.5 \u2014 Restrictions and Limitations", "statement": "Defer contributory negligence reduction to after 52 weeks (was 26)", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Contributory Neg", "type": "Must", "status": "Amended Apr 2023", "effective": "1 Apr 2023", "magRef": "", "notes": "Key amendment"}, {"id": "ACT-029", "source": "Act", "ref": "s 4.4", "actPart": "Part 4 \u2014 Damages", "division": "Div 4.1 \u2014 Application", "statement": "Apply threshold injury restriction on damages (no damages for threshold injury only)", "valueChain": "Claims \u2014 Liability & Damages", "function": "Threshold Gate", "type": "Must", "status": "Amended Apr 2023", "effective": "1 Apr 2023", "magRef": "MAG 5.1\u20135.16", "notes": "Was 'minor injury'"}, {"id": "ACT-030", "source": "Act", "ref": "s 4.6", "actPart": "Part 4 \u2014 Damages", "division": "Div 4.2 \u2014 Damages for Economic Loss", "statement": "Allow damages only where injured person not mostly at fault", "valueChain": "Claims \u2014 Liability & Damages", "function": "Fault Assessment", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-031", "source": "Act", "ref": "s 4.11", "actPart": "Part 4 \u2014 Damages", "division": "Div 4.3 \u2014 Damages for Non-Economic Loss", "statement": "Apply 10% WPI threshold for non-economic loss damages", "valueChain": "Claims \u2014 Liability & Damages", "function": "WPI Assessment", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 6.1+, 4.129A", "notes": ""}, {"id": "ACT-032", "source": "Act", "ref": "s 4.13", "actPart": "Part 4 \u2014 Damages", "division": "Div 4.3 \u2014 Damages for Non-Economic Loss", "statement": "Apply statutory cap on non-economic loss ($654,000 as at Oct 2024)", "valueChain": "Claims \u2014 Liability & Damages", "function": "Damages Cap", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": "Indexed annually"}, {"id": "ACT-033", "source": "Act", "ref": "s 4.15", "actPart": "Part 4 \u2014 Damages", "division": "Div 4.2 \u2014 Damages for Economic Loss", "statement": "Limit economic loss to post-52 week losses (was post-26 week)", "valueChain": "Claims \u2014 Liability & Damages", "function": "Economic Loss", "type": "Must", "status": "Amended Apr 2023", "effective": "1 Apr 2023", "magRef": "", "notes": "Key amendment"}, {"id": "ACT-034", "source": "Act", "ref": "s 4.18", "actPart": "Part 4 \u2014 Damages", "division": "Div 4.4 \u2014 Deduction of Statutory Benefits", "statement": "Deduct statutory benefits paid from damages awards", "valueChain": "Claims \u2014 Liability & Damages", "function": "Offsets", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": "No double recovery"}, {"id": "ACT-035", "source": "Act", "ref": "s 5.2", "actPart": "Part 5 \u2014 No-Fault", "division": "Div 5.1 \u2014 Recovery for No-Fault Accidents", "statement": "Liable to pay damages in a no-fault motor accident", "valueChain": "Claims \u2014 Liability & Damages", "function": "No-Fault", "type": "Liable", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-036", "source": "Act", "ref": "s 5.3", "actPart": "Part 5 \u2014 No-Fault", "division": "Div 5.1 \u2014 Recovery for No-Fault Accidents", "statement": "Burden of proof on insurer to rebut no-fault presumption", "valueChain": "Claims \u2014 Liability & Damages", "function": "Evidence", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-037", "source": "Act", "ref": "s 6.3", "actPart": "Part 6 \u2014 Claims", "division": "Div 6.2 \u2014 General Duties of Insurers", "statement": "Act with good faith in all dealings with claimants", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Good Faith", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 4.5", "notes": "Overarching duty"}, {"id": "ACT-038", "source": "Act", "ref": "s 6.4", "actPart": "Part 6 \u2014 Claims", "division": "Div 6.2 \u2014 General Duties of Insurers", "statement": "Endeavour to resolve claims justly and expeditiously", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Resolution", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 4.5", "notes": ""}, {"id": "ACT-039", "source": "Act", "ref": "s 6.6", "actPart": "Part 6 \u2014 Claims", "division": "Div 6.2 \u2014 General Duties of Insurers", "statement": "Comply with Authority directions for Division 6.2 duties", "valueChain": "Regulatory / Compliance", "function": "Directions", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-040", "source": "Act", "ref": "s 6.7", "actPart": "Part 6 \u2014 Claims", "division": "Div 6.2 \u2014 General Duties of Insurers", "statement": "Report to Authority on compliance with duties", "valueChain": "Regulatory / Compliance", "function": "Reporting", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 3.24\u20133.31", "notes": ""}, {"id": "ACT-041", "source": "Act", "ref": "s 6.19", "actPart": "Part 6 \u2014 Claims", "division": "Div 6.3 \u2014 Insurer Decisions on Claims", "statement": "Accept or deny liability for statutory benefits within prescribed timeframes", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Liability Decision", "type": "Must", "status": "Amended Apr 2023", "effective": "1 Apr 2023", "magRef": "MAG 4.33\u20134.43", "notes": "Timeframes changed"}, {"id": "ACT-042", "source": "Act", "ref": "s 6.20", "actPart": "Part 6 \u2014 Claims", "division": "Div 6.4 \u2014 Claims for Damages", "statement": "Admit or deny liability for damages claim within prescribed period", "valueChain": "Claims \u2014 Liability & Damages", "function": "Damages Liability", "type": "Must", "status": "Amended Nov 2022", "effective": "28 Nov 2022", "magRef": "MAG 4.115\u20134.118A", "notes": "20-month wait removed"}, {"id": "ACT-043", "source": "Act", "ref": "s 6.21", "actPart": "Part 6 \u2014 Claims", "division": "Div 6.4 \u2014 Claims for Damages", "statement": "Liable for costs if liability unreasonably denied", "valueChain": "Claims \u2014 Liability & Damages", "function": "Costs", "type": "Liable", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-044", "source": "Act", "ref": "s 6.22", "actPart": "Part 6 \u2014 Claims", "division": "Div 6.4 \u2014 Claims for Damages", "statement": "Make offer of settlement as soon as practicable", "valueChain": "Claims \u2014 Liability & Damages", "function": "Settlement", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 4.131\u20134.134", "notes": ""}, {"id": "ACT-045", "source": "Act", "ref": "s 6.27", "actPart": "Part 6 \u2014 Claims", "division": "Div 6.4 \u2014 Claims for Damages", "statement": "Pay reasonable travel expenses for claimant attending medical examination", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Expenses", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 4.154", "notes": "Cannot use non-authorised assessors"}, {"id": "ACT-046", "source": "Act", "ref": "s 6.39", "actPart": "Part 6 \u2014 Claims", "division": "Div 6.6 \u2014 Fraud in Relation to Claims", "statement": "Take all reasonable steps to deter and prevent fraudulent claims", "valueChain": "Claims \u2014 Fraud", "function": "Fraud Prevention", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 4.142", "notes": ""}, {"id": "ACT-047", "source": "Act", "ref": "s 7.9", "actPart": "Part 7 \u2014 Disputes", "division": "Div 7.2 \u2014 Internal Review by Insurer", "statement": "Conduct internal review within 14 days and notify claimant of outcome", "valueChain": "Dispute Resolution", "function": "Internal Review", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 7.4\u20137.22", "notes": ""}, {"id": "ACT-048", "source": "Act", "ref": "s 7.16", "actPart": "Part 7 \u2014 Disputes", "division": "Div 7.2 \u2014 Internal Review by Insurer", "statement": "Notify claimant of review rights", "valueChain": "Dispute Resolution", "function": "Notice", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 4.34\u20134.35", "notes": ""}, {"id": "ACT-049", "source": "Act", "ref": "s 7.17", "actPart": "Part 7 \u2014 Disputes", "division": "Div 7.3 \u2014 Medical Assessment", "statement": "Apply updated medical dispute definition (extends to merit review)", "valueChain": "Dispute Resolution", "function": "Dispute Classification", "type": "Must", "status": "Amended Feb 2026", "effective": "18 Feb 2026", "magRef": "", "notes": "Statute Law (Misc) 2025"}, {"id": "ACT-050", "source": "Act", "ref": "s 7.28", "actPart": "Part 7 \u2014 Disputes", "division": "Div 7.3 \u2014 Medical Assessment", "statement": "Pay costs of medical assessment and claimant travel expenses", "valueChain": "Dispute Resolution", "function": "Medical Assessment", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-051", "source": "Act", "ref": "s 7.38(2)", "actPart": "Part 7 \u2014 Disputes", "division": "Div 7.5 \u2014 Claims Assessment", "statement": "Bound by claims assessment of damages amount", "valueChain": "Dispute Resolution", "function": "Claims Assessment", "type": "Bound By", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": "Must accept or commence proceedings"}, {"id": "ACT-052", "source": "Act", "ref": "s 7.46", "actPart": "Part 7 \u2014 Disputes", "division": "Div 7.5 \u2014 Claims Assessment", "statement": "Compliance with PIC Act 2020 is a licence condition", "valueChain": "Dispute Resolution", "function": "PIC Compliance", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": "Licence condition"}, {"id": "ACT-053", "source": "Act", "ref": "s 8.9", "actPart": "Part 8 \u2014 Costs", "division": "Div 8.1 \u2014 Costs and Fees", "statement": "Must not pay more than prescribed maximum fees for treatment and care", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Fee Caps", "type": "Must Not", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-054", "source": "Act", "ref": "s 8.10", "actPart": "Part 8 \u2014 Costs", "division": "Div 8.1 \u2014 Costs and Fees", "statement": "Liable for reasonable and necessary costs of claimant in statutory benefits claims", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Claimant Costs", "type": "Liable", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-055", "source": "Act", "ref": "s 9.1", "actPart": "Part 9 \u2014 Insurers", "division": "Div 9.1 \u2014 Licensing of Insurers", "statement": "Must not act as insurer unless licensed", "valueChain": "Regulatory / Compliance", "function": "Licensing", "type": "Must Not", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-056", "source": "Act", "ref": "s 9.5", "actPart": "Part 9 \u2014 Insurers", "division": "Div 9.1 \u2014 Licensing of Insurers", "statement": "Comply with all conditions of the licence", "valueChain": "Regulatory / Compliance", "function": "Licence Conditions", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": "Overarching"}, {"id": "ACT-057", "source": "Act", "ref": "s 9.7A", "actPart": "Part 9 \u2014 Insurers", "division": "Div 9.1 \u2014 Licensing of Insurers", "statement": "Must not engage or use excluded service providers", "valueChain": "Regulatory / Compliance", "function": "Service Providers", "type": "Must Not", "status": "Inserted 2022", "effective": "28 Nov 2022", "magRef": "", "notes": "New provision"}, {"id": "ACT-058", "source": "Act", "ref": "s 9.13", "actPart": "Part 9 \u2014 Insurers", "division": "Div 9.2 \u2014 Supervision of Insurers", "statement": "Maintain records relating to the licence", "valueChain": "Regulatory / Compliance", "function": "Records", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-059", "source": "Act", "ref": "s 9.16", "actPart": "Part 9 \u2014 Insurers", "division": "Div 9.2 \u2014 Supervision of Insurers", "statement": "Comply with Motor Accident Guidelines on market practice", "valueChain": "Distribution / Policy Issuance", "function": "Market Practice", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG Part 2", "notes": ""}, {"id": "ACT-060", "source": "Act", "ref": "s 9.17", "actPart": "Part 9 \u2014 Insurers", "division": "Div 9.2 \u2014 Supervision of Insurers", "statement": "Comply with market share determinations", "valueChain": "Distribution / Policy Issuance", "function": "Market Share", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-061", "source": "Act", "ref": "s 9.18", "actPart": "Part 9 \u2014 Insurers", "division": "Div 9.2 \u2014 Supervision of Insurers", "statement": "Prepare and submit business plan to Authority", "valueChain": "Regulatory / Compliance", "function": "Business Plan", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG Part 3", "notes": ""}, {"id": "ACT-062", "source": "Act", "ref": "s 9.19", "actPart": "Part 9 \u2014 Insurers", "division": "Div 9.2 \u2014 Supervision of Insurers", "statement": "Have reinsurance arrangements and submit details", "valueChain": "Finance / Levies", "function": "Reinsurance", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-063", "source": "Act", "ref": "s 9.20", "actPart": "Part 9 \u2014 Insurers", "division": "Div 9.2 \u2014 Supervision of Insurers", "statement": "Invest funds in accordance with prescribed requirements", "valueChain": "Finance / Levies", "function": "Investment", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-064", "source": "Act", "ref": "s 9.21", "actPart": "Part 9 \u2014 Insurers", "division": "Div 9.2 \u2014 Supervision of Insurers", "statement": "Keep accounts, returns, and records as required", "valueChain": "Regulatory / Compliance", "function": "Accounting", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-065", "source": "Act", "ref": "s 9.22", "actPart": "Part 9 \u2014 Insurers", "division": "Div 9.2 \u2014 Supervision of Insurers", "statement": "Submit to audit of accounting and other records", "valueChain": "Regulatory / Compliance", "function": "Audit", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-066", "source": "Act", "ref": "s 9.23", "actPart": "Part 9 \u2014 Insurers", "division": "Div 9.2 \u2014 Supervision of Insurers", "statement": "Supply information and documents about business and finances to Authority", "valueChain": "Regulatory / Compliance", "function": "Information Supply", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-067", "source": "Act", "ref": "s 10.7", "actPart": "Part 10 \u2014 Administration", "division": "Div 10.2 \u2014 Motor Accident Guidelines", "statement": "Compliance with Motor Accident Guidelines is a condition of licence", "valueChain": "Regulatory / Compliance", "function": "MAG Compliance", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "All MAG", "notes": "Licence condition"}, {"id": "ACT-068", "source": "Act", "ref": "s 10.9", "actPart": "Part 10 \u2014 Administration", "division": "Div 10.3 \u2014 Bulk Billing Arrangements", "statement": "Participate in bulk billing arrangements as prescribed", "valueChain": "Finance / Levies", "function": "Bulk Billing", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-069", "source": "Act", "ref": "s 10.16", "actPart": "Part 10 \u2014 Administration", "division": "Div 10.4 \u2014 Financial Provisions", "statement": "Collect Fund levy from policyholders", "valueChain": "Finance / Levies", "function": "Levy Collection", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-070", "source": "Act", "ref": "s 10.17", "actPart": "Part 10 \u2014 Administration", "division": "Div 10.4 \u2014 Financial Provisions", "statement": "Pay collected Fund levies to Authority", "valueChain": "Finance / Levies", "function": "Levy Remittance", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-071", "source": "Act", "ref": "s 10.19", "actPart": "Part 10 \u2014 Administration", "division": "Div 10.4 \u2014 Financial Provisions", "statement": "Keep records relating to Fund levy collection", "valueChain": "Finance / Levies", "function": "Records", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-072", "source": "Act", "ref": "s 10.23", "actPart": "Part 10 \u2014 Administration", "division": "Div 10.5 \u2014 Information and Data", "statement": "Participate in data gathering and exchange with Authority", "valueChain": "Privacy / Data", "function": "Data Exchange", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 3.24\u20133.28", "notes": ""}, {"id": "ACT-073", "source": "Act", "ref": "s 10.24", "actPart": "Part 10 \u2014 Administration", "division": "Div 10.5 \u2014 Information and Data", "statement": "Supply required data to Authority", "valueChain": "Privacy / Data", "function": "Data Supply", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 3.24\u20133.28", "notes": ""}, {"id": "ACT-074", "source": "Act", "ref": "s 10.30", "actPart": "Part 10 \u2014 Administration", "division": "Div 10.6 \u2014 Investigative Powers", "statement": "Comply with investigation officer requirements for information, documents, evidence", "valueChain": "Regulatory / Compliance", "function": "Investigations", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-075", "source": "Act", "ref": "s 11.1", "actPart": "Part 11 \u2014 Miscellaneous", "division": "Miscellaneous", "statement": "Cannot contract out of Act obligations", "valueChain": "Legal / General", "function": "Contracting Out", "type": "Must Not", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-076", "source": "Act", "ref": "s 11.11", "actPart": "Part 11 \u2014 Miscellaneous", "division": "Miscellaneous", "statement": "Comply with advertising and marketing regulation", "valueChain": "Distribution / Policy Issuance", "function": "Marketing", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "MAG 2.18", "notes": ""}, {"id": "ACT-077", "source": "Act", "ref": "Sch 1", "actPart": "Schedule 1 \u2014 Transitional", "division": "Transitional", "statement": "Apply correct legislative regime to pre-commencement accidents", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Vintage Rules", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "ACT-078", "source": "Act", "ref": "Sch 1", "actPart": "Schedule 1 \u2014 Transitional", "division": "Transitional", "statement": "Continue handling transitional claims per savings provisions", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Legacy Claims", "type": "Must", "status": "Original", "effective": "1 Dec 2017", "magRef": "", "notes": ""}, {"id": "MAG-001", "source": "MAG v10.1", "ref": "cl 1.6", "actPart": "MAG Part 1 \u2014 Premiums", "division": "Premium Adequacy", "statement": "Premiums must be adequate and not excessive", "valueChain": "Pricing / Actuarial", "function": "Adequacy", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-002", "source": "MAG v10.1", "ref": "cl 1.9\u20131.11", "actPart": "MAG Part 1 \u2014 Premiums", "division": "Filing", "statement": "File premiums with required content and supporting analysis", "valueChain": "Pricing / Actuarial", "function": "Filing", "type": "Must", "status": "Updated v10.1", "effective": "12 Dec 2025", "magRef": "", "notes": "v10.1 updated for 2026"}, {"id": "MAG-003", "source": "MAG v10.1", "ref": "cl 1.13", "actPart": "MAG Part 1 \u2014 Premiums", "division": "Filing", "statement": "Provide additional filing information and sensitivity analysis", "valueChain": "Pricing / Actuarial", "function": "Sensitivity", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-004", "source": "MAG v10.1", "ref": "cl 1.19\u20131.20", "actPart": "MAG Part 1 \u2014 Premiums", "division": "Classification", "statement": "Apply vehicle classification and premium relativities correctly", "valueChain": "Pricing / Actuarial", "function": "Rating", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-005", "source": "MAG v10.1", "ref": "cl 1.27", "actPart": "MAG Part 1 \u2014 Premiums", "division": "Rating Factors", "statement": "Risk-rating factors must be objective and evidence-based", "valueChain": "Pricing / Actuarial", "function": "Rating Factors", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-006", "source": "MAG v10.1", "ref": "cl 1.31\u20131.35", "actPart": "MAG Part 1 \u2014 Premiums", "division": "Bonus-Malus", "statement": "Provide bonus-malus analysis; comply with maximum malus limits", "valueChain": "Pricing / Actuarial", "function": "Bonus-Malus", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-007", "source": "MAG v10.1", "ref": "cl 1.44, 1.46", "actPart": "MAG Part 1 \u2014 Premiums", "division": "ITC Loading", "statement": "Apply ITC loading at 6.5\u20137.5%, uniform across classifications", "valueChain": "Pricing / Actuarial", "function": "ITC", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-008", "source": "MAG v10.1", "ref": "cl 1.58\u20131.60", "actPart": "MAG Part 1 \u2014 Premiums", "division": "Expense & Profit", "statement": "Comply with expense cap (8%) and profit margin cap (8%)", "valueChain": "Pricing / Actuarial", "function": "Caps", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-009", "source": "MAG v10.1", "ref": "cl 1.54\u20131.56", "actPart": "MAG Part 1 \u2014 Premiums", "division": "Valuation", "statement": "Submit valuation report, experience developments, management accounts", "valueChain": "Pricing / Actuarial", "function": "Reporting", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-010", "source": "MAG v10.1", "ref": "cl 2.11", "actPart": "MAG Part 2 \u2014 Market Practice", "division": "Conduct", "statement": "Good faith, non-discrimination, transparency, accessible policies", "valueChain": "Distribution / Policy Issuance", "function": "Conduct", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-011", "source": "MAG v10.1", "ref": "cl 2.12", "actPart": "MAG Part 2 \u2014 Market Practice", "division": "Access", "statement": "Make policies available to all; avoid prejudicial distribution", "valueChain": "Distribution / Policy Issuance", "function": "Access", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-012", "source": "MAG v10.1", "ref": "cl 2.15", "actPart": "MAG Part 2 \u2014 Market Practice", "division": "Renewals", "statement": "Send renewal notices within prescribed timeframes", "valueChain": "Distribution / Policy Issuance", "function": "Renewals", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-013", "source": "MAG v10.1", "ref": "cl 2.16\u20132.17", "actPart": "MAG Part 2 \u2014 Market Practice", "division": "Referrals", "statement": "Must not refer customers to other insurers; must not advise competitor prices", "valueChain": "Distribution / Policy Issuance", "function": "Competition", "type": "Must Not", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-014", "source": "MAG v10.1", "ref": "cl 2.18", "actPart": "MAG Part 2 \u2014 Market Practice", "division": "Communications", "statement": "Communications must be clear, accurate, plain language", "valueChain": "Distribution / Policy Issuance", "function": "Plain Language", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-015", "source": "MAG v10.1", "ref": "cl 2.19", "actPart": "MAG Part 2 \u2014 Market Practice", "division": "Pricing", "statement": "Charge only filed and approved premiums", "valueChain": "Pricing / Actuarial", "function": "Pricing Compliance", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-016", "source": "MAG v10.1", "ref": "cl 2.21", "actPart": "MAG Part 2 \u2014 Market Practice", "division": "Timeliness", "statement": "Mail within 3 business days; electronic within 24 hours", "valueChain": "Distribution / Policy Issuance", "function": "SLAs", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-017", "source": "MAG v10.1", "ref": "cl 2.22", "actPart": "MAG Part 2 \u2014 Market Practice", "division": "Renewals", "statement": "Issue renewals 4\u20136 weeks before expiry", "valueChain": "Distribution / Policy Issuance", "function": "Renewal Timing", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-018", "source": "MAG v10.1", "ref": "cl 2.25", "actPart": "MAG Part 2 \u2014 Market Practice", "division": "eGreenSlip", "statement": "Comply with eGreenSlip transmission timeframes", "valueChain": "Distribution / Policy Issuance", "function": "Digital", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-019", "source": "MAG v10.1", "ref": "cl 2.26", "actPart": "MAG Part 2 \u2014 Market Practice", "division": "Quotes", "statement": "Written quotes must include specified information", "valueChain": "Distribution / Policy Issuance", "function": "Quotation", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-020", "source": "MAG v10.1", "ref": "cl 3.1\u20133.2", "actPart": "MAG Part 3 \u2014 Business Plans", "division": "Plans", "statement": "Prepare and deliver business plan (including multi-brand)", "valueChain": "Regulatory / Compliance", "function": "Business Plan", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-021", "source": "MAG v10.1", "ref": "cl 3.3", "actPart": "MAG Part 3 \u2014 Business Plans", "division": "Accountability", "statement": "Provide compliance confirmation letter from accountable executive", "valueChain": "Regulatory / Compliance", "function": "Attestation", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-022", "source": "MAG v10.1", "ref": "cl 3.5\u20133.16", "actPart": "MAG Part 3 \u2014 Business Plans", "division": "Culture", "statement": "Demonstrate culture alignment with Act objectives and CSCP (Schedule 3A)", "valueChain": "Regulatory / Compliance", "function": "Culture", "type": "Must", "status": "New v10", "effective": "15 Sep 2025", "magRef": "", "notes": "Enhanced in v10"}, {"id": "MAG-023", "source": "MAG v10.1", "ref": "cl 3.18\u20133.23", "actPart": "MAG Part 3 \u2014 Business Plans", "division": "Complaints", "statement": "Acknowledge complaints within 5 business days; resolve within 20 business days; notify of outcome and escalation", "valueChain": "Regulatory / Compliance", "function": "Complaints", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": "SLA obligations"}, {"id": "MAG-024", "source": "MAG v10.1", "ref": "cl 3.24\u20133.26", "actPart": "MAG Part 3 \u2014 Business Plans", "division": "Data", "statement": "Accurate UCD data; injury coding; error correction (Tier 0=next day, Tier 1=10 days, Tier 2/3=20 days)", "valueChain": "Privacy / Data", "function": "Data Quality", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-025", "source": "MAG v10.1", "ref": "cl 3.28", "actPart": "MAG Part 3 \u2014 Business Plans", "division": "Records", "statement": "Retain digital claims files for minimum 30 years", "valueChain": "Privacy / Data", "function": "Retention", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-026", "source": "MAG v10.1", "ref": "cl 3.29", "actPart": "MAG Part 3 \u2014 Business Plans", "division": "Data Breach", "statement": "Notify SIRA of data breach simultaneously with Privacy Commissioner", "valueChain": "Privacy / Data", "function": "Breach Notification", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-027", "source": "MAG v10.1", "ref": "cl 3.30\u20133.31", "actPart": "MAG Part 3 \u2014 Business Plans", "division": "Self-Audit", "statement": "Conduct self-audit on direction from Authority", "valueChain": "Regulatory / Compliance", "function": "Audit", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-028", "source": "MAG v10.1", "ref": "cl 4.5", "actPart": "MAG Part 4 \u2014 Claims", "division": "General Duties", "statement": "All communications consistent with Act objects", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Communications", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-029", "source": "MAG v10.1", "ref": "cl 4.9", "actPart": "MAG Part 4 \u2014 Claims", "division": "Communication", "statement": "Direct communication with claimant; accommodate support person", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Claimant Contact", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-030", "source": "MAG v10.1", "ref": "cl 4.9A", "actPart": "MAG Part 4 \u2014 Claims", "division": "Communication", "statement": "Warn of distressing content; provide opportunity for nominated person to receive", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Distressing Content", "type": "Must", "status": "New v10", "effective": "15 Sep 2025", "magRef": "", "notes": "NEW in v10"}, {"id": "MAG-031", "source": "MAG v10.1", "ref": "cl 4.10", "actPart": "MAG Part 4 \u2014 Claims", "division": "Communication", "statement": "In PIC disputes, communicate only with legal representative", "valueChain": "Dispute Resolution", "function": "Legal Comms", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-032", "source": "MAG v10.1", "ref": "cl 4.24\u20134.26", "actPart": "MAG Part 4 \u2014 Claims", "division": "Lodgement", "statement": "Send pre-filled claim form; acknowledge receipt; assign claim number and contact", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Claim Intake", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-033", "source": "MAG v10.1", "ref": "cl 4.28\u20134.31", "actPart": "MAG Part 4 \u2014 Claims", "division": "Sharing", "statement": "Manage claim transfers; written agreements; contact within 2 business days", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Transfers", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-034", "source": "MAG v10.1", "ref": "cl 4.33", "actPart": "MAG Part 4 \u2014 Claims", "division": "Liability", "statement": "Written notice of acceptance or denial of liability", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Liability Notice", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-035", "source": "MAG v10.1", "ref": "cl 4.34\u20134.35", "actPart": "MAG Part 4 \u2014 Claims", "division": "Liability", "statement": "Enhanced clarity requirements for liability decision notices (reasons, evidence, review rights, IRO contact)", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Decision Notices", "type": "Must", "status": "Amended v10", "effective": "15 Sep 2025", "magRef": "", "notes": "Strengthened in v10"}, {"id": "MAG-036", "source": "MAG v10.1", "ref": "cl 4.43", "actPart": "MAG Part 4 \u2014 Claims", "division": "Liability", "statement": "On new information: provide copy, review within 21 days, issue new notice if changed", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Reassessment", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-037", "source": "MAG v10.1", "ref": "cl 4.44", "actPart": "MAG Part 4 \u2014 Claims", "division": "Weekly Payments", "statement": "Commence weekly payments within 10 business days of accepting liability", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Payment Start", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": "SLA"}, {"id": "MAG-038", "source": "MAG v10.1", "ref": "cl 4.45", "actPart": "MAG Part 4 \u2014 Claims", "division": "Weekly Payments", "statement": "Provide written notice explaining calculation of pre-accident weekly earnings", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Earnings Notice", "type": "Must", "status": "New v10", "effective": "15 Sep 2025", "magRef": "", "notes": "NEW in v10"}, {"id": "MAG-039", "source": "MAG v10.1", "ref": "cl 4.48\u20134.49", "actPart": "MAG Part 4 \u2014 Claims", "division": "Weekly Payments", "statement": "Pay difference within 10 business days if weekly exceeds interim; consider claimant financial position on overpayment", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Adjustments", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": "4.49 'should' \u2192 'must' in v10"}, {"id": "MAG-040", "source": "MAG v10.1", "ref": "cl 4.62\u20134.63", "actPart": "MAG Part 4 \u2014 Claims", "division": "Suspension", "statement": "Before suspending: contact in writing, state consequences, allow \u22657 days, provide IRO details; follow notice requirements", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Suspension", "type": "Must", "status": "Amended v10", "effective": "15 Sep 2025", "magRef": "", "notes": "Strengthened in v10"}, {"id": "MAG-041", "source": "MAG v10.1", "ref": "cl 4.64\u20134.66", "actPart": "MAG Part 4 \u2014 Claims", "division": "Discontinuation", "statement": "Notice before discontinuing/reducing with reasons, review rights, IRO contact, copy to legal rep", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Discontinuation", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-042", "source": "MAG v10.1", "ref": "cl 4.80", "actPart": "MAG Part 4 \u2014 Claims", "division": "Recovery", "statement": "Manage claims tailored to individual circumstances", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Tailored Mgmt", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-043", "source": "MAG v10.1", "ref": "cl 4.81", "actPart": "MAG Part 4 \u2014 Claims", "division": "Recovery", "statement": "Apply Clinical Framework", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Clinical Framework", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-044", "source": "MAG v10.1", "ref": "cl 4.83", "actPart": "MAG Part 4 \u2014 Claims", "division": "Recovery", "statement": "Screen within 3 business days; direct contact; record outcome", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Screening", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": "SLA"}, {"id": "MAG-045", "source": "MAG v10.1", "ref": "cl 4.84", "actPart": "MAG Part 4 \u2014 Claims", "division": "Recovery", "statement": "Comprehensive assessment if medium+ risk", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Assessment", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-046", "source": "MAG v10.1", "ref": "cl 4.89\u20134.96", "actPart": "MAG Part 4 \u2014 Claims", "division": "Recovery Plan", "statement": "Recovery plan within 28 days; review every 12 weeks; minimum content; distribute to claimant and providers", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Recovery Plan", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": "Key SLAs"}, {"id": "MAG-047", "source": "MAG v10.1", "ref": "cl 4.102\u20134.107", "actPart": "MAG Part 4 \u2014 Claims", "division": "Treatment", "statement": "Facilitate referral within 10 days; treatment decisions within 10 days; payment within 20 days; provide correspondence on request", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Treatment Mgmt", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": "Multiple SLAs"}, {"id": "MAG-048", "source": "MAG v10.1", "ref": "cl 4.115\u20134.118A", "actPart": "MAG Part 4 \u2014 Claims", "division": "Damages", "statement": "Damages claim decisions; advise of dispute rights", "valueChain": "Claims \u2014 Liability & Damages", "function": "Damages Decision", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-049", "source": "MAG v10.1", "ref": "cl 4.125\u20134.126", "actPart": "MAG Part 4 \u2014 Claims", "division": "Damages", "statement": "Damages liability notice requirements", "valueChain": "Claims \u2014 Liability & Damages", "function": "Damages Notice", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-050", "source": "MAG v10.1", "ref": "cl 4.129A", "actPart": "MAG Part 4 \u2014 Claims", "division": "Damages", "statement": "If medical report shows WPI >10%, promptly seek further info and advise claimant what is sought and why (Atwal duty)", "valueChain": "Claims \u2014 Liability & Damages", "function": "WPI Assessment", "type": "Must", "status": "New v10", "effective": "15 Sep 2025", "magRef": "", "notes": "Atwal v IAL [2025] NSWSC 143"}, {"id": "MAG-051", "source": "MAG v10.1", "ref": "cl 4.131\u20134.134", "actPart": "MAG Part 4 \u2014 Claims", "division": "Damages", "statement": "Regular review for quantification; settlement offer content and payment timeframes", "valueChain": "Claims \u2014 Liability & Damages", "function": "Settlement", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": "4.131 'should' \u2192 'must' in v10"}, {"id": "MAG-052", "source": "MAG v10.1", "ref": "cl 4.136\u20134.141", "actPart": "MAG Part 4 \u2014 Claims", "division": "Nominal Defendant", "statement": "Use specified language and terms for Nominal Defendant claims", "valueChain": "Claims \u2014 Liability & Damages", "function": "Nominal Defendant", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-053", "source": "MAG v10.1", "ref": "cl 4.142", "actPart": "MAG Part 4 \u2014 Claims", "division": "Investigations", "statement": "Comply with investigation obligations", "valueChain": "Claims \u2014 Fraud", "function": "Investigations", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": "'should' \u2192 'must' in v10"}, {"id": "MAG-054", "source": "MAG v10.1", "ref": "cl 4.146", "actPart": "MAG Part 4 \u2014 Claims", "division": "Surveillance", "statement": "Comply with surveillance requirements", "valueChain": "Claims \u2014 Fraud", "function": "Surveillance", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-055", "source": "MAG v10.1", "ref": "cl 4.154, 4.157\u20134.158", "actPart": "MAG Part 4 \u2014 Claims", "division": "Medical Exams", "statement": "Comply with medical examination requirements and evidence retention", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Medical Exams", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-056", "source": "MAG v10.1", "ref": "cl 5.4", "actPart": "MAG Part 5 \u2014 Threshold", "division": "Imaging", "statement": "Must not require injured person to undergo diagnostic imaging for threshold injury determination", "valueChain": "Claims \u2014 Liability & Damages", "function": "Imaging", "type": "Must Not", "status": "Amended v10", "effective": "15 Sep 2025", "magRef": "", "notes": "'should' \u2192 'must' in v10"}, {"id": "MAG-057", "source": "MAG v10.1", "ref": "cl 7.4\u20137.6", "actPart": "MAG Part 7 \u2014 Disputes", "division": "Obligations", "statement": "Insurer obligations and duties in disputes", "valueChain": "Dispute Resolution", "function": "Dispute Duties", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-058", "source": "MAG v10.1", "ref": "cl 7.9", "actPart": "MAG Part 7 \u2014 Disputes", "division": "Internal Review", "statement": "Acknowledge internal review receipt within 2 business days", "valueChain": "Dispute Resolution", "function": "Acknowledgement", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": "SLA"}, {"id": "MAG-059", "source": "MAG v10.1", "ref": "cl 7.22", "actPart": "MAG Part 7 \u2014 Disputes", "division": "Internal Review", "statement": "Conduct merit-based assessment on internal review", "valueChain": "Dispute Resolution", "function": "Merit Assessment", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-060", "source": "MAG v10.1", "ref": "cl 8.7", "actPart": "MAG Part 8 \u2014 Health", "division": "Joint Assessment", "statement": "Use best endeavours to agree to joint medical assessment", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Joint Assessment", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "MAG-061", "source": "MAG v10.1", "ref": "cl 8.9", "actPart": "MAG Part 8 \u2014 Health", "division": "Instructions", "statement": "Instruct practitioner in writing; report to both parties", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Practitioner Mgmt", "type": "Must", "status": "Original", "effective": "15 Sep 2025", "magRef": "", "notes": ""}, {"id": "CARE-001", "source": "CTP Care v1.1", "ref": "cl 1.1, 1.3", "actPart": "CTP Care Part 1 \u2014 Principles and General Obligations", "division": "Part 1 \u2014 Principles and General Obligations", "statement": "Good faith, collaboration, CSCP; 9 specific obligations including seamless transition", "valueChain": "Claims \u2014 Statutory Benefits", "function": "LCSA Transition", "type": "Must", "status": "Original", "effective": "1 Mar 2024", "magRef": "", "notes": ""}, {"id": "CARE-002", "source": "CTP Care v1.1", "ref": "cl 2.1\u20132.2", "actPart": "CTP Care Part 2 \u2014 Before LCSA is the Relevant Insurer", "division": "Part 2 \u2014 Before LCSA is the Relevant Insurer", "statement": "Provide LCSA with accurate data and all supporting documents no later than 5 business days before transfer", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Data Transfer", "type": "Must", "status": "Updated v1.1", "effective": "1 Mar 2024", "magRef": "", "notes": "Updated in v1.1"}, {"id": "CARE-003", "source": "CTP Care v1.1", "ref": "cl 2.4", "actPart": "CTP Care Part 2 \u2014 Before LCSA is the Relevant Insurer", "division": "Part 2 \u2014 Before LCSA is the Relevant Insurer", "statement": "Notify LCSA within 2 business days when inactive claim becomes active post-5 years", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Reactivation", "type": "Must", "status": "Original", "effective": "1 Mar 2024", "magRef": "", "notes": ""}, {"id": "CARE-004", "source": "CTP Care v1.1", "ref": "cl 2.9\u20132.13", "actPart": "CTP Care Part 2 \u2014 Before LCSA is the Relevant Insurer", "division": "Part 2 \u2014 Before LCSA is the Relevant Insurer", "statement": "Transition notices: EBA = 2 weeks; standard = 6-month and 2-week notices with specified content", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Transition Notice", "type": "Must", "status": "Updated v1.1", "effective": "1 Mar 2024", "magRef": "", "notes": "Updated in v1.1"}, {"id": "CARE-005", "source": "CTP Care v1.1", "ref": "cl 2.14", "actPart": "CTP Care Part 2 \u2014 Before LCSA is the Relevant Insurer", "division": "Part 2 \u2014 Before LCSA is the Relevant Insurer", "statement": "Notify treatment/care service providers at least 2 weeks before transition", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Provider Notice", "type": "Must", "status": "Original", "effective": "1 Mar 2024", "magRef": "", "notes": ""}, {"id": "CARE-006", "source": "CTP Care v1.1", "ref": "cl 3.1\u20133.2", "actPart": "CTP Care Part 3 \u2014 After LCSA is the Relevant Insurer", "division": "Part 3 \u2014 After LCSA is the Relevant Insurer", "statement": "Continue providing new data/information to LCSA within 5 business days of receipt", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Ongoing Data", "type": "Must", "status": "Original", "effective": "1 Mar 2024", "magRef": "", "notes": ""}, {"id": "CARE-007", "source": "CTP Care v1.1", "ref": "cl 3.5", "actPart": "CTP Care Part 3 \u2014 After LCSA is the Relevant Insurer", "division": "Part 3 \u2014 After LCSA is the Relevant Insurer", "statement": "Notify LCSA within 5 business days after damages claim finalised", "valueChain": "Claims \u2014 Liability & Damages", "function": "Damages Notification", "type": "Must", "status": "Original", "effective": "1 Mar 2024", "magRef": "", "notes": ""}, {"id": "CARE-010", "source": "CTP Care v1.1", "ref": "cl 4.7", "actPart": "CTP Care Part 4 \u2014 Complaints", "division": "Part 4 \u2014 Complaints", "statement": "Participate in joint complaints handling with LCSA where complaint relates to both insurer and LCSA responsibilities", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Complaints", "type": "Must", "status": "Original", "effective": "1 Mar 2024", "magRef": "", "notes": "Joint obligation with LCSA"}, {"id": "CARE-011", "source": "CTP Care v1.1", "ref": "cl 5.2", "actPart": "CTP Care Part 5 \u2014 Recovery Plans", "division": "Part 5 \u2014 Recovery Plans", "statement": "Provide LCSA with the most recent recovery plan as part of the transition documentation", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Recovery Plans", "type": "Must", "status": "Original", "effective": "1 Mar 2024", "magRef": "", "notes": "Linked to cl 2.2(e) data provision"}, {"id": "CARE-012", "source": "CTP Care v1.1", "ref": "cl 6.6", "actPart": "CTP Care Part 6 \u2014 Treatment and Care", "division": "Part 6 \u2014 Treatment and Care", "statement": "Provide relevant claim information to LCSA within 2 business days if claim is active, or 5 business days if inactive, when requested", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Treatment Info", "type": "Must", "status": "Original", "effective": "1 Mar 2024", "magRef": "", "notes": ""}, {"id": "CARE-013", "source": "CTP Care v1.1", "ref": "cl 6.9", "actPart": "CTP Care Part 6 \u2014 Treatment and Care", "division": "Part 6 \u2014 Treatment and Care", "statement": "Comply with payment responsibility allocation for treatment and care around the transfer date (insurer responsible for treatment provided before transfer)", "valueChain": "Claims \u2014 Statutory Benefits", "function": "Payment Allocation", "type": "Must", "status": "Original", "effective": "1 Mar 2024", "magRef": "", "notes": ""}, {"id": "CARE-008", "source": "CTP Care v1.1", "ref": "cl 7.2", "actPart": "CTP Care Part 7 \u2014 Claims Made More Than 5 Years from Accident", "division": "Part 7 \u2014 Claims Made More Than 5 Years from Accident", "statement": "Make all non-treatment/care decisions on late claims (fault, liability, threshold, contributory negligence)", "valueChain": "Claims \u2014 Liability & Damages", "function": "Late Claims", "type": "Must", "status": "Original", "effective": "1 Mar 2024", "magRef": "", "notes": ""}, {"id": "CARE-009", "source": "CTP Care v1.1", "ref": "cl 8.1, 8.3", "actPart": "CTP Care Part 8 \u2014 Internal Review and Disputes", "division": "Part 8 \u2014 Internal Review and Disputes", "statement": "Resolve disputes justly/expeditiously; allocated internal review responsibilities", "valueChain": "Dispute Resolution", "function": "LCSA Disputes", "type": "Must", "status": "Original", "effective": "1 Mar 2024", "magRef": "", "notes": ""}, {"id": "REG-001", "source": "SIRA Framework", "ref": "Sig Matters Policy", "actPart": "Regulatory Framework", "division": "Reporting", "statement": "Promptly notify SIRA of significant matters (policies, claims, operations)", "valueChain": "Regulatory / Compliance", "function": "Significant Matters", "type": "Must", "status": "New Mar 2024", "effective": "1 Mar 2024", "magRef": "", "notes": ""}, {"id": "PEND-001", "source": "Pending", "ref": "Micromobility Act Sch 2", "actPart": "Pending Legislation", "division": "Scope", "statement": "PENDING: Exclude micromobility-only accidents from CTP scheme once proclaimed", "valueChain": "Underwriting / Product", "function": "Exclusions", "type": "Must", "status": "Pending", "effective": "TBC", "magRef": "", "notes": "Assented not commenced"}, {"id": "PEND-002", "source": "Pending", "ref": "Claim Farming Bill", "actPart": "Pending Legislation", "division": "Fraud", "statement": "PENDING: Prohibition on claim farming practices \u2014 penalties up to $55,000", "valueChain": "Claims \u2014 Fraud", "function": "Claim Farming", "type": "Must Not", "status": "Pending", "effective": "TBC", "magRef": "", "notes": "Before Parliament"}];
+const vcMap={"Claims \u2014 Statutory Benefits":"vc-csb","Claims \u2014 Liability & Damages":"vc-cld","Regulatory / Compliance":"vc-rc","Pricing / Actuarial":"vc-pa","Distribution / Policy Issuance":"vc-dpi","Finance / Levies":"vc-fl","Dispute Resolution":"vc-dr","Underwriting / Product":"vc-up","Claims \u2014 Fraud":"vc-cf","Privacy / Data":"vc-pd","Legal / General":"vc-lg"};
+function getVC(v){return vcMap[v]||"vc-lg"}
+function getSC(s){if(s.includes("New")||s.includes("Inserted"))return"s-new";if(s.includes("Amended")||s.includes("Updated"))return"s-amd";if(s==="Pending")return"s-pnd";return""}
+function getSB(s){if(s.includes("New")||s.includes("Inserted"))return"sb-new";if(s.includes("Amended")||s.includes("Updated"))return"sb-amd";if(s==="Pending")return"sb-pnd";return"sb-orig"}
+function isChanged(s){return s!=="Original"}
 
-const obligations = DATA.obligations;
-
-// ─── STATE ───
-let currentDetailIndex = -1;
-let currentVisibleList = obligations;
-
-// ─── INIT ───
-function init() {
-  buildOwnerFilter();
-  buildPartFilter();
-  renderObligationsTable(obligations);
-  renderChangesTable();
-  buildOwnerChart();
-  buildPartChart();
-  buildStatusChart();
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
+function init(){
+  buildFilters();renderTable(D);renderChanges();buildCharts();buildChainView();
 }
-
-function buildOwnerFilter() {
-  const owners = [...new Set(obligations.map(o => o.owner))].sort();
-  const sel = document.getElementById('filter-owner');
-  owners.forEach(o => { const opt = document.createElement('option'); opt.value = o; opt.textContent = o; sel.appendChild(opt); });
+function buildFilters(){
+  var srcs=[...new Set(D.map(function(d){return d.source}))];
+  var vcs=[...new Set(D.map(function(d){return d.valueChain}))].sort();
+  var parts=[...new Set(D.map(function(d){return d.actPart}))];
+  var fs=document.getElementById("f-src");srcs.forEach(function(s){var o=document.createElement("option");o.value=s;o.textContent=s;fs.appendChild(o)});
+  var fv=document.getElementById("f-vc");vcs.forEach(function(v){var o=document.createElement("option");o.value=v;o.textContent=v;fv.appendChild(o)});
+  var fp=document.getElementById("f-part");parts.forEach(function(p){var o=document.createElement("option");o.value=p;o.textContent=p;fp.appendChild(o)});
 }
-
-function buildPartFilter() {
-  const partLabels = { P2: 'Part 2 — Insurance', P3: 'Part 3 — Statutory Benefits', P4: 'Part 4 — Damages', P5: 'Part 5 — Disputes (Act)', P6: 'Part 6 — Regulation', P7: 'Part 7 — Miscellaneous', NEW: 'New Obligations', PEND: 'Pending' };
-  const parts = [...new Set(obligations.map(o => o.part))];
-  const sel = document.getElementById('filter-part');
-  parts.forEach(p => { const opt = document.createElement('option'); opt.value = p; opt.textContent = partLabels[p] || p; sel.appendChild(opt); });
-}
-
-function getOwnerClass(owner) {
-  const base = owner.split(/[\s\/]/)[0];
-  const known = ['Claims','Legal','Compliance','Finance','Underwriting','Operations','Pricing','Privacy'];
-  return known.includes(base) ? 'owner-' + base : 'owner-default';
-}
-
-function renderObligationsTable(data) {
-  const tbody = document.getElementById('obligations-tbody');
-  tbody.innerHTML = '';
-  currentVisibleList = data;
-  data.forEach((o, idx) => {
-    const statusClass = o.status !== 'original' ? 'status-' + o.status : '';
-    const badgeClass = 'badge-' + o.status;
-    const statusLabel = o.status === 'original' ? 'Validated' : o.status.charAt(0).toUpperCase() + o.status.slice(1);
-    const tr = document.createElement('tr');
-    tr.className = statusClass + ' clickable-row';
-    tr.onclick = () => openDetail(o, idx, data);
-    tr.innerHTML = `
-      <td class="id-cell">${o.id}</td>
-      <td class="ref-cell">${o.ref}</td>
-      <td>${o.statement}</td>
-      <td>${o.trigger}</td>
-      <td>${o.risk}</td>
-      <td>${o.controls}</td>
-      <td><span class="owner-badge ${getOwnerClass(o.owner)}" onclick="event.stopPropagation();drillDown('owner','${o.owner}')" style="cursor:pointer">${o.owner}</span></td>
-      <td><span class="status-badge ${badgeClass}" onclick="event.stopPropagation();drillDown('status','${o.status}')" style="cursor:pointer">${statusLabel}</span></td>
-      <td style="white-space:nowrap;font-size:12px">${o.effective}</td>
-    `;
-    tbody.appendChild(tr);
+function renderTable(data){
+  var tb=document.getElementById("tb");tb.innerHTML="";var cp="";
+  data.forEach(function(d){
+    if(d.actPart!==cp){cp=d.actPart;var gr=document.createElement("tr");gr.className="grp-row";gr.innerHTML="<td colspan=\"10\">"+cp+"</td>";tb.appendChild(gr)}
+    var tr=document.createElement("tr");tr.className=getSC(d.status);
+    tr.innerHTML="<td class=\"idc\">"+d.id+"</td><td>"+d.source+"</td><td style=\"font-size:11px\">"+d.division+"</td><td style=\"font-size:11px\">"+d.actPart+"</td><td class=\"refc\">"+d.ref+"</td><td>"+d.statement+"</td><td><span class=\"vc "+getVC(d.valueChain)+"\">"+d.valueChain+"</span></td><td style=\"font-size:11px\">"+d.type+"</td><td><span class=\"sb "+getSB(d.status)+"\">"+d.status+"</span></td><td style=\"white-space:nowrap;font-size:11px\">"+d.effective+"</td>";
+    tb.appendChild(tr)
   });
-  document.getElementById('result-count').textContent = `Showing ${data.length} of ${obligations.length} obligations`;
+  document.getElementById("rc").textContent="Showing "+data.length+" of "+D.length+" obligations";
 }
-
-function renderChangesTable() {
-  const changed = obligations.filter(o => o.status !== 'original');
-  const tbody = document.getElementById('changes-tbody');
-  tbody.innerHTML = '';
-  changed.forEach((o, idx) => {
-    const statusClass = 'status-' + o.status;
-    const badgeClass = 'badge-' + o.status;
-    const statusLabel = o.status.charAt(0).toUpperCase() + o.status.slice(1);
-    const tr = document.createElement('tr');
-    tr.className = statusClass + ' clickable-row';
-    tr.onclick = () => openDetail(o, idx, changed);
-    tr.innerHTML = `
-      <td class="id-cell">${o.id}</td>
-      <td class="ref-cell">${o.ref}</td>
-      <td>${o.statement}</td>
-      <td><span class="owner-badge ${getOwnerClass(o.owner)}" onclick="event.stopPropagation();drillDown('owner','${o.owner}')" style="cursor:pointer">${o.owner}</span></td>
-      <td><span class="status-badge ${badgeClass}" onclick="event.stopPropagation();drillDown('status','${o.status}')" style="cursor:pointer">${statusLabel}</span></td>
-      <td style="white-space:nowrap;font-size:12px">${o.effective}</td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-function filterTable() {
-  const q = document.getElementById('search-input').value.toLowerCase();
-  const owner = document.getElementById('filter-owner').value;
-  const part = document.getElementById('filter-part').value;
-  const status = document.getElementById('filter-status').value;
-  const filtered = obligations.filter(o => {
-    if (q && !(o.id.toLowerCase().includes(q) || o.statement.toLowerCase().includes(q) || o.ref.toLowerCase().includes(q) || o.owner.toLowerCase().includes(q) || o.controls.toLowerCase().includes(q))) return false;
-    if (owner && o.owner !== owner) return false;
-    if (part && o.part !== part) return false;
-    if (status && o.status !== status) return false;
+function filt(){
+  var q=document.getElementById("q").value.toLowerCase();
+  var src=document.getElementById("f-src").value;
+  var vc=document.getElementById("f-vc").value;
+  var st=document.getElementById("f-st").value;
+  var pt=document.getElementById("f-part").value;
+  var f=D.filter(function(d){
+    if(q&&!(d.id.toLowerCase().includes(q)||d.statement.toLowerCase().includes(q)||d.ref.toLowerCase().includes(q)||d.valueChain.toLowerCase().includes(q)||d.division.toLowerCase().includes(q)))return false;
+    if(src&&d.source!==src)return false;
+    if(vc&&d.valueChain!==vc)return false;
+    if(pt&&d.actPart!==pt)return false;
+    if(st){if(st==="new"&&!d.status.includes("New")&&!d.status.includes("Inserted"))return false;
+    if(st==="amended"&&!d.status.includes("Amended")&&!d.status.includes("Updated"))return false;
+    if(st==="pending"&&d.status!=="Pending")return false;
+    if(st==="original"&&d.status!=="Original")return false}
     return true;
   });
-  renderObligationsTable(filtered);
+  renderTable(f);
 }
-
-function switchTab(name) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  event.target.closest('.tab-btn').classList.add('active');
-  document.getElementById('panel-' + name).classList.add('active');
-  if (name !== 'obligations') {
-    document.getElementById('breadcrumb').classList.remove('visible');
+function renderChanges(){
+  var ch=D.filter(function(d){return isChanged(d.status)});
+  var tb=document.getElementById("ctb");tb.innerHTML="";
+  ch.forEach(function(d){
+    var tr=document.createElement("tr");tr.className=getSC(d.status);
+    tr.innerHTML="<td class=\"idc\">"+d.id+"</td><td>"+d.source+"</td><td style=\"font-size:11px\">"+d.division+"</td><td class=\"refc\">"+d.ref+"</td><td>"+d.statement+"</td><td><span class=\"vc "+getVC(d.valueChain)+"\">"+d.valueChain+"</span></td><td><span class=\"sb "+getSB(d.status)+"\">"+d.status+"</span></td><td style=\"white-space:nowrap;font-size:11px\">"+d.effective+"</td><td style=\"font-size:11px;color:var(--g300)\">"+d.notes+"</td>";
+    tb.appendChild(tr)
+  });
+}
+function buildChainView(){
+  var allChains=[...new Set(D.map(function(d){return d.valueChain}))].sort();
+  var selected=new Set(allChains);
+  var filterEl=document.getElementById("vc-filter");
+  var tablesEl=document.getElementById("chain-tables");
+  function renderChips(){
+    filterEl.innerHTML="";
+    var allOn=selected.size===allChains.length;
+    var allBtn=document.createElement("span");
+    allBtn.className="vc-chip-all"+(allOn?"":" off");
+    allBtn.textContent=allOn?"Deselect All":"Select All";
+    allBtn.addEventListener("click",function(){if(allOn){selected.clear()}else{allChains.forEach(function(c){selected.add(c)})}renderChips();renderTables()});
+    filterEl.appendChild(allBtn);
+    allChains.forEach(function(vc){
+      var cnt=D.filter(function(d){return d.valueChain===vc}).length;
+      var chip=document.createElement("span");
+      chip.className="vc-chip"+(selected.has(vc)?" on":"");
+      chip.innerHTML=vc+"<span class=\"chip-ct\">"+cnt+"</span>";
+      chip.addEventListener("click",function(){if(selected.has(vc)){selected.delete(vc)}else{selected.add(vc)}renderChips();renderTables()});
+      filterEl.appendChild(chip);
+    });
   }
-}
-
-// ─── DRILL DOWN ───
-function drillDown(type, value) {
-  // Switch to obligations tab
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  const tabBtns = document.querySelectorAll('.tab-btn');
-  tabBtns[1].classList.add('active'); // "All Obligations" tab
-  document.getElementById('panel-obligations').classList.add('active');
-
-  // Clear existing filters
-  document.getElementById('search-input').value = '';
-  document.getElementById('filter-owner').value = '';
-  document.getElementById('filter-part').value = '';
-  document.getElementById('filter-status').value = '';
-
-  const breadcrumb = document.getElementById('breadcrumb');
-  const breadcrumbLabel = document.getElementById('breadcrumb-label');
-
-  if (type === 'all') {
-    breadcrumb.classList.remove('visible');
-    renderObligationsTable(obligations);
-    return;
+  function renderTables(){
+    tablesEl.innerHTML="";
+    allChains.forEach(function(vc){
+      if(!selected.has(vc))return;
+      var items=D.filter(function(d){return d.valueChain===vc});
+      var h="<div class=\"ccard\" style=\"margin-bottom:16px\"><h3><span class=\"vc "+getVC(vc)+"\" style=\"font-size:13px;padding:4px 12px\">"+vc+"</span> <span style=\"color:var(--g300);font-size:13px;font-weight:400\">("+items.length+" obligations)</span></h3>";
+      h+="<div class=\"tw\" style=\"box-shadow:none\"><div class=\"ts\" style=\"max-height:400px\"><table><thead><tr><th>ID</th><th>Source</th><th>Division</th><th>Reference</th><th>Obligation</th><th>Function</th><th>Status</th></tr></thead><tbody>";
+      items.forEach(function(d){
+        h+="<tr class=\""+getSC(d.status)+"\"><td class=\"idc\">"+d.id+"</td><td>"+d.source+"</td><td style=\"font-size:11px\">"+d.division+"</td><td class=\"refc\">"+d.ref+"</td><td>"+d.statement+"</td><td style=\"font-size:11px\">"+d["function"]+"</td><td><span class=\"sb "+getSB(d.status)+"\">"+d.status+"</span></td></tr>";
+      });
+      h+="</tbody></table></div></div></div>";
+      tablesEl.innerHTML+=h;
+    });
+    if(selected.size===0){tablesEl.innerHTML="<div class=\"ccard\" style=\"text-align:center;padding:40px;color:var(--g300)\">Select one or more value chain segments above</div>"}
   }
-
-  // Set filter and label
-  const labels = {
-    'owner': value,
-    'status': { original: 'Original (validated)', new: 'New Obligations', amended: 'Amended', pending: 'Pending Legislation' }[value] || value,
-    'part': { P2: 'Part 2 — Insurance', P3: 'Part 3 — Statutory Benefits', P4: 'Part 4 — Damages', P5: 'Part 5 — Disputes', P6: 'Part 6 — Regulation', P7: 'Part 7 — Miscellaneous', NEW: 'New Obligations', PEND: 'Pending' }[value] || value
-  };
-
-  if (type === 'owner') document.getElementById('filter-owner').value = value;
-  if (type === 'status') document.getElementById('filter-status').value = value;
-  if (type === 'part') document.getElementById('filter-part').value = value;
-
-  breadcrumbLabel.textContent = labels[type];
-  breadcrumb.classList.add('visible');
-
-  filterTable();
-
-  // Smooth scroll to table
-  document.getElementById('panel-obligations').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  renderChips();renderTables();
 }
-
-function clearDrillDown() {
-  document.getElementById('search-input').value = '';
-  document.getElementById('filter-owner').value = '';
-  document.getElementById('filter-part').value = '';
-  document.getElementById('filter-status').value = '';
-  document.getElementById('breadcrumb').classList.remove('visible');
-
-  // Go back to overview
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn')[0].classList.add('active');
-  document.getElementById('panel-overview').classList.add('active');
-  renderObligationsTable(obligations);
-}
-
-// ─── DETAIL PANEL ───
-function openDetail(obligation, index, list) {
-  currentDetailIndex = index;
-  currentVisibleList = list;
-  renderDetail(obligation);
-  document.getElementById('detail-overlay').classList.add('open');
-  document.getElementById('detail-panel').classList.add('open');
-  document.body.style.overflow = 'hidden';
-  updateDetailNav();
-}
-
-function closeDetail() {
-  document.getElementById('detail-overlay').classList.remove('open');
-  document.getElementById('detail-panel').classList.remove('open');
-  document.body.style.overflow = '';
-  currentDetailIndex = -1;
-}
-
-function navigateDetail(dir) {
-  const newIndex = currentDetailIndex + dir;
-  if (newIndex < 0 || newIndex >= currentVisibleList.length) return;
-  currentDetailIndex = newIndex;
-  renderDetail(currentVisibleList[newIndex]);
-  updateDetailNav();
-}
-
-function updateDetailNav() {
-  document.getElementById('detail-prev').disabled = currentDetailIndex <= 0;
-  document.getElementById('detail-next').disabled = currentDetailIndex >= currentVisibleList.length - 1;
-}
-
-function renderDetail(o) {
-  const statusLabel = o.status === 'original' ? 'Validated' : o.status.charAt(0).toUpperCase() + o.status.slice(1);
-  const badgeClass = 'badge-' + o.status;
-
-  document.getElementById('detail-title').innerHTML = `
-    <span class="id-cell" style="font-size:16px">${o.id}</span>
-    <span class="status-badge ${badgeClass}">${statusLabel}</span>
-  `;
-
-  document.getElementById('detail-body').innerHTML = `
-    <div class="detail-section">
-      <h4>Reference</h4>
-      <p style="font-family:'JetBrains Mono',monospace;color:var(--navy)">${o.ref}</p>
-    </div>
-    <div class="detail-section">
-      <h4>Obligation</h4>
-      <p>${o.statement}</p>
-    </div>
-    <div class="detail-field-grid">
-      <div class="detail-section">
-        <h4>Trigger</h4>
-        <p>${o.trigger}</p>
-      </div>
-      <div class="detail-section">
-        <h4>Effective Date</h4>
-        <p>${o.effective}</p>
-      </div>
-    </div>
-    <div class="detail-section">
-      <h4>Risk</h4>
-      <p style="color:var(--red-flag);font-weight:500">${o.risk}</p>
-    </div>
-    <div class="detail-section">
-      <h4>Controls</h4>
-      <p>${o.controls}</p>
-    </div>
-    <div class="detail-section">
-      <h4>Evidence</h4>
-      <p>${o.evidence || '—'}</p>
-    </div>
-    <div class="detail-field-grid">
-      <div class="detail-section">
-        <h4>Owner</h4>
-        <div><span class="owner-badge ${getOwnerClass(o.owner)}">${o.owner}</span></div>
-      </div>
-      <div class="detail-section">
-        <h4>Act Part</h4>
-        <p>${o.part}</p>
-      </div>
-    </div>
-  `;
-}
-
-// ─── CHARTS ───
-function buildOwnerChart() {
-  const counts = {};
-  obligations.forEach(o => { counts[o.owner] = (counts[o.owner] || 0) + 1; });
-  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-  const max = sorted[0][1];
-  const container = document.getElementById('owner-chart');
-  const colors = ['navy-bar', 'teal-bar', 'orange-bar'];
-  sorted.forEach(([owner, count], i) => {
-    const pct = (count / max * 100).toFixed(0);
-    container.innerHTML += `<div class="bar-row clickable" onclick="drillDown('owner','${owner}')"><div class="bar-label">${owner}</div><div class="bar-track"><div class="bar-fill ${colors[i % 3]}" style="width:${pct}%"><span>${count}</span></div></div></div>`;
+function buildCharts(){
+  var colors=["bf-ny","bf-tl","bf-or"];
+  function chart(id,counts,filterField,sortBy){
+    var entries=Object.entries(counts);
+    if(sortBy==="count")entries.sort(function(a,b){return b[1]-a[1]});
+    var mx=Math.max.apply(null,entries.map(function(e){return e[1]}));
+    var el=document.getElementById(id);
+    entries.forEach(function(entry,i){
+      var k=entry[0],v=entry[1];
+      var pct=(v/mx*100);
+      var narrow=pct<15?"narrow":"";
+      var row=document.createElement("div");
+      row.className="bar-r";
+      row.title="Click to filter: "+k;
+      row.innerHTML="<div class=\"bar-l\">"+k+"</div><div class=\"bar-t\"><div class=\"bar-f "+colors[i%3]+" "+narrow+"\" style=\"width:"+pct+"%\"><span>"+v+"</span></div></div>";
+      row.addEventListener("click",function(){
+        sw2("all");
+        document.getElementById("q").value="";
+        document.getElementById("f-src").value="";
+        document.getElementById("f-vc").value="";
+        document.getElementById("f-part").value="";
+        document.getElementById("f-st").value="";
+        if(filterField==="valueChain")document.getElementById("f-vc").value=k;
+        else if(filterField==="source")document.getElementById("f-src").value=k;
+        else if(filterField==="actPart")document.getElementById("f-part").value=k;
+        filt();
+      });
+      el.appendChild(row);
+    });
+  }
+  var byChain={},bySrc={},byAct={},byMAG={},byOther={};
+  D.forEach(function(d){
+    byChain[d.valueChain]=(byChain[d.valueChain]||0)+1;
+    bySrc[d.source]=(bySrc[d.source]||0)+1;
+    if(d.source==="Act")byAct[d.actPart]=(byAct[d.actPart]||0)+1;
+    else if(d.source==="MAG v10.1")byMAG[d.actPart]=(byMAG[d.actPart]||0)+1;
+    else byOther[d.actPart]=(byOther[d.actPart]||0)+1;
   });
+  chart("ch-chain",byChain,"valueChain","count");
+  chart("ch-source",bySrc,"source","count");
+  chart("ch-act",byAct,"actPart","natural");
+  chart("ch-mag",byMAG,"actPart","natural");
+  chart("ch-other",byOther,"actPart","natural");
 }
-
-function buildPartChart() {
-  const partLabels = { P2: 'Pt 2 Insurance', P3: 'Pt 3 Benefits', P4: 'Pt 4 Damages', P5: 'Pt 5 At-Fault', P6: 'Pt 6 Claims', P7: 'Pt 7 Misc/Trans', NEW: 'New (MAG/Reg)', PEND: 'Pending' };
-  const counts = {};
-  obligations.forEach(o => { counts[o.part] = (counts[o.part] || 0) + 1; });
-  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-  const max = sorted[0][1];
-  const container = document.getElementById('part-chart');
-  const colors = ['navy-bar', 'teal-bar', 'orange-bar'];
-  sorted.forEach(([part, count], i) => {
-    container.innerHTML += `<div class="bar-row clickable" onclick="drillDown('part','${part}')"><div class="bar-label">${partLabels[part] || part}</div><div class="bar-track"><div class="bar-fill ${colors[i % 3]}" style="width:${(count / max * 100).toFixed(0)}%"><span>${count}</span></div></div></div>`;
-  });
-}
-
-function buildStatusChart() {
-  const counts = { original: 0, new: 0, amended: 0, pending: 0 };
-  obligations.forEach(o => { counts[o.status] = (counts[o.status] || 0) + 1; });
-  const labels = { original: 'Original (validated)', new: 'New obligations', amended: 'Amended', pending: 'Pending legislation' };
-  const barColors = { original: 'navy-bar', new: 'teal-bar', amended: 'orange-bar', pending: 'navy-bar' };
-  const container = document.getElementById('status-chart');
-  const max = Math.max(...Object.values(counts));
-  Object.entries(counts).forEach(([status, count]) => {
-    container.innerHTML += `<div class="bar-row clickable" onclick="drillDown('status','${status}')"><div class="bar-label">${labels[status]}</div><div class="bar-track"><div class="bar-fill ${barColors[status]}" style="width:${(count / max * 100).toFixed(0)}%"><span>${count}</span></div></div></div>`;
-  });
-}
-
+function sw(n){document.querySelectorAll(".tab").forEach(function(t){t.classList.remove("on")});document.querySelectorAll(".pnl").forEach(function(p){p.classList.remove("on")});event.target.closest(".tab").classList.add("on");document.getElementById("p-"+n).classList.add("on")}
+function sw2(n){document.querySelectorAll(".tab").forEach(function(t){t.classList.remove("on");if(t.getAttribute("data-tab")===n)t.classList.add("on")});document.querySelectorAll(".pnl").forEach(function(p){p.classList.remove("on")});document.getElementById("p-"+n).classList.add("on")}
 init();
 </script>
-</body>
-</html>
+</body></html>
